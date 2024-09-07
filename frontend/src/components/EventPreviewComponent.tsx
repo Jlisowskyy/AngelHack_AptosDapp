@@ -8,9 +8,10 @@ import {EventInterface} from '@/interface/EventInterface';
 interface EventPreviewComponentProps {
     data: EventInterface;
     click?: ((data: EventInterface) => void) | null;
+    isTrade?: boolean;
 }
 
-const EventPreviewComponent: React.FC<EventPreviewComponentProps> = ({data, click = null}) => {
+const EventPreviewComponent: React.FC<EventPreviewComponentProps> = ({data, click = null, isTrade = false}) => {
     const runClick = () => {
         if (click) {
             click(data);
@@ -27,8 +28,9 @@ const EventPreviewComponent: React.FC<EventPreviewComponentProps> = ({data, clic
                         <Link href={data.link} className="text-blue-500 hover:underline">Visit</Link>
                     </div>
                     <div className="font-semibold">
-                        <p>{`Location: ${data.location}`}</p>
-                        <p>{`Date: ${data.date}`}</p>
+                        <p>{`Where: ${data.location}`}</p>
+                        <p>{`When: ${data.date}`}</p>
+                        <p>{`How much: ${isTrade ? data.tradePrice : data.price}`}</p>
                     </div>
                 </div>
             </div>

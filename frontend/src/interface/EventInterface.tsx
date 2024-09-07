@@ -5,4 +5,10 @@ export interface EventInterface {
     location: string;
     image: string;
     link: string;
+    ticketsLeft: number;
+    ticketsTrades: number;
+    price: number;
+    tradePrice?: number;
+    tradeSeller?: string;
+    tradeSellerId?: string;
 }
