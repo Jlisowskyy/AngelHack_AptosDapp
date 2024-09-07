@@ -1,6 +1,7 @@
+import BlankPage from "@/components/BlankPage";
+
 export default function Home() {
     return (
-        <div>
-        </div>
+        <BlankPage name={"Home page"}/>
     );
 }
