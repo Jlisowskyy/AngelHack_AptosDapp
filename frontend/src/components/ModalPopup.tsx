@@ -1,7 +1,7 @@
 'use client';
 
 import React, {useState} from 'react';
-import { X } from 'lucide-react';
+import {X} from 'lucide-react';
 
 const ModalWindow = ({children, isOpen, onClose}: {
     children: React.ReactNode,
@@ -14,9 +14,7 @@ const ModalWindow = ({children, isOpen, onClose}: {
     return (
         <div className={"fixed inset-0 z-50 flex items-center justify-center"}>
             <div className={"absolute inset-0 bg-black opacity-50"}/>
-            <div
-                className={`relative bg-white rounded-lg p-6 transform transition-all duration-500 ease-in-out 
-                ${isOpen ? "" : ""}`}>
+            <div className={`relative bg-white rounded-lg p-6`}>
                 <button onClick={onClose} className={"absolute top-2 right-2"}>
                     <X size={24}/>
                 </button>
@@ -27,8 +25,8 @@ const ModalWindow = ({children, isOpen, onClose}: {
 }
 
 interface ModalPopupProps {
-    children: (stopLoading: () => void) => React.ReactNode;
-    modalWindow: React.ReactNode;
+    children: (openModal: () => void) => React.ReactNode;
+    modalWindow: (closeModal: () => void) => React.ReactNode;
 }
 
 const ModalPopup: React.FC<ModalPopupProps> = ({modalWindow, children}) => {
@@ -40,7 +38,7 @@ const ModalPopup: React.FC<ModalPopupProps> = ({modalWindow, children}) => {
         <>
             {children(openModal)}
             <ModalWindow isOpen={isModalOpen} onClose={closeModal}>
-                {modalWindow}
+                {modalWindow(closeModal)}
             </ModalWindow>
         </>
     );

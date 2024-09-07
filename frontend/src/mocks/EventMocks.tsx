@@ -4,7 +4,7 @@ export const EventMocks: EventInterface[] = [
     {
         title: "Event 1",
         description: "Event 1 Description",
-        date: "2022-01-01",
+        date: "2025-01-01",
         location: "Event 1 Location",
         image: "https://i.imgur.com/gsALUPb.jpeg",
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
@@ -15,7 +15,7 @@ export const EventMocks: EventInterface[] = [
     {
         title: "Event 2",
         description: "Event 2 Description",
-        date: "2022-01-02",
+        date: "2025-01-02",
         location: "Event 2 Location",
         image: "https://i.imgur.com/gsALUPb.jpeg",
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
@@ -26,7 +26,7 @@ export const EventMocks: EventInterface[] = [
     {
         title: "Event 3",
         description: "Event 3 Description",
-        date: "2022-01-03",
+        date: "2025-01-03",
         location: "Event 3 Location",
         image: "https://i.imgur.com/gsALUPb.jpeg",
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
@@ -37,7 +37,7 @@ export const EventMocks: EventInterface[] = [
     {
         title: "Event 1",
         description: "Event 1 Description",
-        date: "2022-01-01",
+        date: "2025-01-01",
         location: "Event 1 Location",
         image: "https://i.imgur.com/gsALUPb.jpeg",
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
@@ -48,7 +48,7 @@ export const EventMocks: EventInterface[] = [
     {
         title: "Event 2",
         description: "Event 2 Description",
-        date: "2022-01-02",
+        date: "2025-01-02",
         location: "Event 2 Location",
         image: "https://i.imgur.com/gsALUPb.jpeg",
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
@@ -59,7 +59,7 @@ export const EventMocks: EventInterface[] = [
     {
         title: "Event 3",
         description: "Event 3 Description",
-        date: "2022-01-03",
+        date: "2025-01-03",
         location: "Event 3 Location",
         image: "https://i.imgur.com/gsALUPb.jpeg",
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
@@ -73,7 +73,7 @@ export const TradeMocks: EventInterface[] = [
     {
         title: "Event 2",
         description: "Event 2 Description",
-        date: "2022-01-02",
+        date: "2025-01-02",
         location: "Event 2 Location",
         image: "https://i.imgur.com/gsALUPb.jpeg",
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
@@ -86,7 +86,7 @@ export const TradeMocks: EventInterface[] = [
     {
         title: "Event 3",
         description: "Event 3 Description",
-        date: "2022-01-03",
+        date: "2025-01-03",
         location: "Event 3 Location",
         image: "https://i.imgur.com/gsALUPb.jpeg",
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
@@ -101,7 +101,7 @@ export const TradeMocks: EventInterface[] = [
 export const TicketMocks: EventInterface[] = [{
     title: "Event 3",
     description: "Event 3 Description",
-    date: "2022-01-03",
+    date: "2025-01-03",
     location: "Event 3 Location",
     image: "https://i.imgur.com/gsALUPb.jpeg",
     link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
@@ -112,11 +112,12 @@ export const TicketMocks: EventInterface[] = [{
     {
         title: "Event 1",
         description: "Event 1 Description",
-        date: "2022-01-01",
+        date: "2025-01-01",
         location: "Event 1 Location",
         image: "https://i.imgur.com/gsALUPb.jpeg",
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
         ticketsLeft: 100,
         ticketsTrades: 10,
         price: 100
-    },];
+    },
+];
