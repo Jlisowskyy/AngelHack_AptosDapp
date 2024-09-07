@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {EventInterface} from '@/interface/EventInterface';
+import {Ripple} from "react-ripple-click";
 
 interface EventPreviewComponentProps {
     data: EventInterface;
@@ -19,7 +20,11 @@ const EventPreviewComponent: React.FC<EventPreviewComponentProps> = ({data, clic
     };
 
     return (
-        <div className="bg-amber-100 shadow-xl rounded-2xl p-4" onClick={runClick}>
+        <button
+            className="bg-amber-50 shadow-xl rounded-2xl p-4 relative isolate overflow-hidden w-full text-left"
+            onClick={runClick}
+        >
+            <Ripple/>
             <div className="flex flex-row">
                 <Image src={data.image} alt={data.title} width={128} height={128} className="rounded-full mr-[2rem]"/>
                 <div className="flex-col flex w-full justify-between">
@@ -34,7 +39,7 @@ const EventPreviewComponent: React.FC<EventPreviewComponentProps> = ({data, clic
                     </div>
                 </div>
             </div>
-        </div>
+        </button>
     );
 };
 
