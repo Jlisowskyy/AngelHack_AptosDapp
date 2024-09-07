@@ -5,6 +5,16 @@ import LoadingComponent from "@/components/LoadingComponent";
 import EventListComponent from "@/components/EventListComponent";
 import {EventMocks} from "@/mocks/EventMocks";
 import {EventInterface} from "@/interface/EventInterface";
+import ModalPopup from "@/components/ModalPopup";
+
+const ModalWindow = () => {
+    return (
+        <div>
+            <h1>Modal Window</h1>
+            <p>This is a modal window.</p>
+        </div>
+    );
+};
 
 const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
     useEffect(() => {
@@ -16,12 +26,19 @@ const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
         return () => clearTimeout(timer);
     }, [onLoad]);
 
-    const onClick = (data: EventInterface) => {
-        console.log(data);
-    }
-
     return (
-        <EventListComponent data={EventMocks} buttonText={"Buy ticket"} click={onClick}/>
+        <ModalPopup modalWindow={<ModalWindow/>}>
+            {(openModal) => (
+                <EventListComponent
+                    data={EventMocks}
+                    buttonText={"Buy Tickets"}
+                    click={(data: EventInterface) => {
+                        console.log(data);
+                        openModal();
+                    }}
+                />
+            )}
+        </ModalPopup>
     );
 };
 
