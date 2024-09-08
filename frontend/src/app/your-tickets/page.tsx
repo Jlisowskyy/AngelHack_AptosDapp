@@ -115,7 +115,7 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
     );
 };
 
-const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
+const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({onLoad, onError}) => {
     const [data, setData] = useState<EventInterface | null>(null);
 
     useEffect(() => {
@@ -153,9 +153,9 @@ const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
 
 export default function Page() {
     return (
-        <LoadingComponent text={"Loading trades..."}>
-            {(stopLoading) => (
-                <AsyncContent onLoad={stopLoading}/>
+        <LoadingComponent text={"Loading trades..."} errorText={"Failed to fetch your tickets..."}>
+            {(stopLoading, onError) => (
+                <AsyncContent onLoad={stopLoading} onError={onError}/>
             )}
         </LoadingComponent>
     );

@@ -3,18 +3,14 @@
 import React, {useEffect, useState} from "react";
 import LoadingComponent from "@/components/LoadingComponent";
 import EventListComponent from "@/components/EventListComponent";
-import {EventMocks} from "@/mocks/EventMocks";
 import {EventInterface} from "@/interface/EventInterface";
 import ModalPopup from "@/components/ModalPopup";
 import {Ripple} from "react-ripple-click";
+import {FetchEvents} from "@/communication/EventComms";
 
 const ProcessPurchase = ({data}: { data: EventInterface }) => {
     console.log(data)
 };
-
-const LoadEvents =  async () => {
-    console.log("Loading events...");
-}
 
 const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventInterface | null }) => {
     return (
@@ -38,17 +34,19 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
     );
 };
 
-const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
+const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({onLoad, onError}) => {
+    const [events, setEvents] = useState<EventInterface[]>([]);
     const [data, setData] = useState<EventInterface | null>(null);
 
     useEffect(() => {
-        // Simulate an asynchronous operation
-        const timer = setTimeout(() => {
+        FetchEvents().then((events) => {
+            setEvents(events);
             onLoad();
-        }, 1500); // 3 seconds delay
-
-        return () => clearTimeout(timer);
-    }, [onLoad]);
+        }).catch((error) => {
+            console.error(error);
+            onError();
+        });
+    }, [onLoad, onError]);
 
     return (
         <ModalPopup modalWindow={
@@ -58,7 +56,7 @@ const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
         >
             {(openModal) => (
                 <EventListComponent
-                    data={EventMocks}
+                    data={events}
                     buttonText={"Buy tickets"}
                     click={(data: EventInterface) => {
                         setData(data);
@@ -72,9 +70,9 @@ const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
 
 export default function Page() {
     return (
-        <LoadingComponent text={"Loading events ..."}>
-            {(stopLoading) => (
-                <AsyncContent onLoad={stopLoading}/>
+        <LoadingComponent text={"Loading events ..."} errorText={"Failed to fetch ongoing events..."}>
+            {(stopLoading, startError) => (
+                <AsyncContent onLoad={stopLoading} onError={startError}/>
             )}
         </LoadingComponent>
     );

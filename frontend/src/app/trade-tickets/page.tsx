@@ -40,7 +40,7 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
     );
 };
 
-const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
+const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({onLoad, onError}) => {
     const [data, setData] = useState<EventInterface | null>(null);
 
     useEffect(() => {
@@ -50,7 +50,7 @@ const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
         }, 1500); // 3 seconds delay
 
         return () => clearTimeout(timer);
-    }, [onLoad]);
+    }, [onLoad, onError]);
 
     return (
         <ModalPopup modalWindow={
@@ -75,9 +75,9 @@ const AsyncContent: React.FC<{ onLoad: () => void }> = ({onLoad}) => {
 
 export default function Page() {
     return (
-        <LoadingComponent text={"Loading trades..."}>
-            {(stopLoading) => (
-                <AsyncContent onLoad={stopLoading}/>
+        <LoadingComponent text={"Loading trades..."} errorText={"Failed to fetch trade offers..."}>
+            {(stopLoading, onError) => (
+                <AsyncContent onLoad={stopLoading} onError={onError}/>
             )}
         </LoadingComponent>
     );
