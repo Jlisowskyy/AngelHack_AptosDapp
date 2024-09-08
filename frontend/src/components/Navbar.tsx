@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from "next/image";
+import {WalletSelector} from "@/components/WalletSelector";
 
 const Navbar: React.FC = () => {
     return (<nav className='bg-black text-white p-4 sticky top-0 z-50 border-b-2 border-b-white h-[4.5rem]'>
@@ -30,6 +31,8 @@ const Navbar: React.FC = () => {
                 <Link className='hover:transition-colors hover:text-gray-400 duration-300'
                       href='/create-event'>Create event</Link>
             </div>
+
+            <WalletSelector/>
         </div>
     </nav>);
 }
