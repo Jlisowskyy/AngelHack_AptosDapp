@@ -1,6 +1,7 @@
 'use client';
 
-import { EventInterface } from '@/interface/EventInterface';
+import {EventInterface} from '@/interface/EventInterface';
+import {GetTicketsLeft, GetTicketsTrades} from "@/communication/UtilComms";
 
 export async function SubmitEvent(event: EventInterface): Promise<EventInterface | null> {
     try {
@@ -40,6 +41,12 @@ export async function FetchEvents(): Promise<EventInterface[]> {
         }
 
         const events: EventInterface[] = await response.json();
+
+        for (const event of events) {
+            event.ticketsLeft = await GetTicketsLeft(event.collectionID) || 0;
+            event.ticketsTrades = await GetTicketsTrades(event.collectionID) || 0;
+        }
+
         return events;
     } catch (error) {
         console.error('Error fetching events:', error);
