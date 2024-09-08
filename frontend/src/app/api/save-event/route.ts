@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     try {
         const newEvent: EventInterface = await req.json();
 
-        const requiredFields: (keyof EventInterface)[] = ['title', 'description', 'date', 'location', 'image', 'link', 'ticketsLeft', 'ticketsTrades', 'price'];
+        const requiredFields: (keyof EventInterface)[] = ['collectionID', 'title', 'description', 'date', 'location', 'image', 'link', 'ticketsLeft', 'ticketsTrades', 'price'];
         for (const field of requiredFields) {
             if (!(field in newEvent)) {
                 return NextResponse.json({ error: `Missing required field: ${field}` }, { status: 400 });
