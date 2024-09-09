@@ -6,8 +6,8 @@ import Footer from "@/components/Footer";
 import {WalletProvider} from "@/components/WalletProvider";
 import {NotificationProvider} from "@/components/NotificationContext";
 import {NotificationComponent} from "@/components/NotificationComponent";
-import {ApolloProvider} from "@apollo/client";
 import ApolloWrapper from "@/components/ApolloWrapper";
+import {TooltipProvider} from "@/components/ui/tooltip";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -44,10 +44,12 @@ export default function RootLayout({
         <WalletProvider>
             <NotificationProvider>
                 <ApolloWrapper>
-                    <Navbar/>
-                    <main>{children}</main>
-                    <NotificationComponent/>
-                    <Footer/>
+                    <TooltipProvider>
+                        <Navbar/>
+                        <main>{children}</main>
+                        <NotificationComponent/>
+                        <Footer/>
+                    </TooltipProvider>
                 </ApolloWrapper>
             </NotificationProvider>
         </WalletProvider>

@@ -75,6 +75,34 @@ export const GetCreateCollectionRequest = (args: CreateCollectionArguments): Inp
 
 export async function SubmitEvent(event: EventInterface): Promise<void> {
     throw new Error('Not implemented');
+
+    const {signAndSubmitTransaction} = useWallet();
+
+
+    // Submit a create_collection entry function transaction
+    const response = await signAndSubmitTransaction(
+        GetCreateCollectionRequest({
+            collectionDescription: event.description,
+            collectionName: event.title,
+            projectUri: "",
+            maxSupply : event.initialTicketPool || 1,
+            royaltyPercentage: 0,
+            preMintAmount: 0,
+            allowList: undefined,
+            allowListStartDate: undefined,
+            allowListEndDate: undefined,
+            allowListLimitPerAccount: undefined,
+            allowListFeePerNFT: undefined,
+            publicMintStartDate: event.publicMintStartDate,
+            publicMintEndDate: event.publicMintEndDate,
+            publicMintLimitPerAccount: 1,
+            publicMintFeePerNFT : event.price,
+        }),
+    );
+
+    await GetAptosClient().waitForTransaction({
+        transactionHash: response.hash,
+    });
 }
 
 export async function SubmitEventToDB(event: EventInterface): Promise<EventInterface | null> {

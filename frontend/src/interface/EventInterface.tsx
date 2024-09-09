@@ -17,4 +17,9 @@ export interface EventInterface {
     tradeSeller?: string; // Name of seller in the trade
     tradeSellerId?: string; // ID of seller in the trade
     tradeTokenId?: string; // ID of token in the trade
+
+    // Data to submit event
+    initialTicketPool?: number; // Initial number of tickets to be minted
+    publicMintStartDate?: Date; // Date to start public mint
+    publicMintEndDate?: Date; // Date to end public mint
 }
