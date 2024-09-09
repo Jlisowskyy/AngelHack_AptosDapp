@@ -3,6 +3,10 @@
 import {EventInterface} from '@/interface/EventInterface';
 import {GetTicketsLeft, GetTicketsTrades} from "@/communication/UtilComms";
 import {TicketMocks} from "@/mocks/EventMocks";
+import {InputTransactionData} from "@aptos-labs/wallet-adapter-react";
+import {useWallet} from "@aptos-labs/wallet-adapter-react";
+import {aptosClient} from "@/utils/AptosClient";
+
 
 export async function SubmitEvent(event: EventInterface): Promise<EventInterface | null> {
     try {
@@ -59,6 +63,33 @@ export async function FetchTickets(): Promise<EventInterface[]> {
     return TicketMocks;
 }
 
+export type MintNftArguments = {
+    collectionId: string;
+    amount: number;
+};
+
+export const MintNFTRequest = (args: MintNftArguments): InputTransactionData => {
+    const {collectionId, amount} = args;
+    return {
+        data: {
+            function: `${process.env.MODULE_ADDRESS}::launchpad::mint_nft`,
+            typeArguments: [],
+            functionArguments: [collectionId, amount],
+        },
+    };
+};
+
 export async function BuyTicket(event: EventInterface): Promise<void> {
-    throw new Error('Not implemented');
+    // throw new Error('Not implemented');
+
+    const {account, signAndSubmitTransaction} = useWallet();
+
+    if (!account) {
+        throw new Error('Wallet not connected');
+    }
+
+    const response = await signAndSubmitTransaction(
+        MintNFTRequest({ collectionId: event.collectionID, amount: 1 }),
+    );
+    await aptosClient().waitForTransaction({ transactionHash: response.hash });
 }
