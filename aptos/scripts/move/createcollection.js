@@ -1,10 +1,15 @@
-const { AptosClient, AptosAccount, TxnBuilderTypes, BCS } = require("aptos");
+const { AptosClient, AptosAccount, TxnBuilderTypes, BCS, HexString  } = require("aptos");
 
 // Initialize the Aptos client
-const client = new AptosClient('https://fullnode.devnet.aptoslabs.com');
+const client = new AptosClient('https://fullnode.testnet.aptoslabs.com');
 
 // Replace with your deployed module address
-const MODULE_ADDRESS = '0x123...'; // The address where you deployed the module
+const MODULE_ADDRESS = '0x037b2e7c51a9cd60116b00c9bdb8e23ce57254a787b602fd2b3a105dcd961ba7'; // The address where you deployed the module
+
+function createExistingAccount(privateKeyHex) {
+  const privateKey = HexString.ensure(privateKeyHex).toUint8Array();
+  return new AptosAccount(privateKey);
+}
 
 async function createCollection(
   creator,
@@ -26,7 +31,7 @@ async function createCollection(
 ) {
   const payload = {
     type: "entry_function_payload",
-    function: `${MODULE_ADDRESS}::your_module_name::create_collection`,
+    function: `${MODULE_ADDRESS}::launchpad::create_collection`,
     type_arguments: [],
     arguments: [
       description,
@@ -57,26 +62,27 @@ async function createCollection(
 
 // Example usage
 async function main() {
-  const creator = new AptosAccount(); // Replace with actual creator account
+  const privateKeyHex = ""; // Your private key here
+  const creator = createExistingAccount(privateKeyHex);
 
   try {
     await createCollection(
       creator,
-      "My awesome NFT collection",
-      "AwesomeNFTs",
+      "My awesome NFT collection_2",
+      "AwesomeNFTs_2",
       "https://my-nft-collection.com/",
-      1000, // max supply
-      5, // 5% royalty
-      10, // pre-mint 10 NFTs
+      10, // max supply
+      1, // royalty percent
+      1, // pre-mint 
       ["0x1", "0x2", "0x3"], // allowlist
-      Math.floor(Date.now() / 1000), // allowlist start in 1 hour
-      Math.floor(Date.now() / 1000) + 1, // allowlist end in 2 hours
-      1, // allowlist mint limit per address
-      100, // allowlist mint fee 1 APT (100000000 octas)
-      Math.floor(Date.now() / 1000) + 1, // public mint start in 3 hours
-      Math.floor(Date.now() / 1000) + 864000, // public mint end in 24 hours
-      2, // public mint limit per address
-      200 // public mint fee 2 APT (200000000 octas)
+      Math.floor(Date.now() / 1000), // allowlist start
+      Math.floor(Date.now() / 1000) + 10, // allowlist end
+      4, // allowlist mint limit per address
+      100, // allowlist mint fee 
+      Math.floor(Date.now() / 1000) + 10, // public mint start 
+      Math.floor(Date.now() / 1000) + 864000, // public mint end 
+      4, // public mint limit per address
+      200 // public mint fee in octas
     );
   } catch (error) {
     console.error("Error creating collection:", error);
