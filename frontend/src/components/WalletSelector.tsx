@@ -49,9 +49,9 @@ export function WalletSelector() {
     return connected ? (
         <DropdownMenu >
             <DropdownMenuTrigger asChild>
-                <Button>{account?.ansName || truncateAddress(account?.address) || "Unknown"}</Button>
+                <Button variant={"green"}>{account?.ansName || truncateAddress(account?.address) || "Unknown"}</Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
+            <DropdownMenuContent align="end" className={"bg-white"}>
                 <DropdownMenuItem onSelect={copyAddress} className="gap-2">
                     <Copy className="h-4 w-4"/> Copy address
                 </DropdownMenuItem>
@@ -71,7 +71,7 @@ export function WalletSelector() {
     ) : (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-                <Button>Connect a Wallet</Button>
+                <Button variant={"green"}>Connect a Wallet</Button>
             </DialogTrigger>
             <ConnectWalletDialog close={closeDialog}/>
         </Dialog>
