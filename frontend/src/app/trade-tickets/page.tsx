@@ -7,13 +7,18 @@ import {EventInterface} from "@/interface/EventInterface";
 import ModalPopup from "@/components/ModalPopup";
 import {Ripple} from "react-ripple-click";
 import {AcceptTrade, FetchTrades} from "@/communication/TradeComms";
+import {useNotification} from "@/components/NotificationContext";
 
 const TradeTicket = ({data}: { data: EventInterface }) => {
+    const { addNotification } = useNotification();
+
     console.log(`Trading ticket with: ${data.tradeSeller} for ${data.tradePrice}`);
     AcceptTrade(data).then(() => {
         console.log(`Trade with ${data.tradeSeller} for ${data.tradePrice} was successful`);
+        addNotification('success', "Trade was successful");
     }).catch((error) => {
         console.error(`Trade with ${data.tradeSeller} for ${data.tradePrice} failed: ${error}`);
+        addNotification('error', "Trade failed");
     });
 };
 

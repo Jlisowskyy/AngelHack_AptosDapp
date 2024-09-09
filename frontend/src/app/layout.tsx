@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import {WalletProvider} from "@/components/WalletProvider";
+import {NotificationProvider} from "@/components/NotificationContext";
+import {NotificationComponent} from "@/components/NotificationComponent";
 
 const geistSans = localFont({
     src: "./fonts/GeistVF.woff",
@@ -38,9 +40,12 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
         <WalletProvider>
-            <Navbar/>
+            <NotificationProvider>
+                <Navbar/>
                 <main>{children}</main>
-            <Footer/>
+                <NotificationComponent/>
+                <Footer/>
+            </NotificationProvider>
         </WalletProvider>
         </body>
         </html>
