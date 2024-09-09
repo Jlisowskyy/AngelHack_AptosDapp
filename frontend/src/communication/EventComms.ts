@@ -2,6 +2,7 @@
 
 import {EventInterface} from '@/interface/EventInterface';
 import {GetTicketsLeft, GetTicketsTrades} from "@/communication/UtilComms";
+import {TicketMocks} from "@/mocks/EventMocks";
 
 export async function SubmitEvent(event: EventInterface): Promise<EventInterface | null> {
     try {
@@ -52,4 +53,12 @@ export async function FetchEvents(): Promise<EventInterface[]> {
         console.error('Error fetching events:', error);
         throw error;
     }
+}
+
+export async function FetchTickets(): Promise<EventInterface[]> {
+    return TicketMocks;
+}
+
+export async function BuyTicket(event: EventInterface): Promise<void> {
+    throw new Error('Not implemented');
 }

@@ -6,10 +6,15 @@ import EventListComponent from "@/components/EventListComponent";
 import {EventInterface} from "@/interface/EventInterface";
 import ModalPopup from "@/components/ModalPopup";
 import {Ripple} from "react-ripple-click";
-import {FetchEvents} from "@/communication/EventComms";
+import {BuyTicket, FetchEvents} from "@/communication/EventComms";
 
-const ProcessPurchase = ({data}: { data: EventInterface }) => {
-    console.log(data)
+const ProcessPurchase = async ({data}: { data: EventInterface }) => {
+    console.log(`Buying ticket for: ${data}`);
+    BuyTicket(data).then(() => {
+        console.log("Ticket bought successfully");
+    }).catch((error) => {
+        console.error("Error buying ticket: ", error);
+    });
 };
 
 const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventInterface | null }) => {
@@ -20,9 +25,9 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
             <button
                 className={"bg-green-600 hover:bg-green-800 text-white" +
                     " font-bold py-2 px-4 rounded text-2xl relative isolate overflow-hidden"}
-                onClick={() => {
+                onClick={async () => {
                     if (data !== null) {
-                        ProcessPurchase({data});
+                        await ProcessPurchase({data});
                     }
                     closeModal();
                 }}

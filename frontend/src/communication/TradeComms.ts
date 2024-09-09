@@ -5,12 +5,13 @@ import {EventInterface} from '@/interface/EventInterface';
 import {MODULE_ADDRESS} from "@/utils/AptosClient";
 import {FetchEvents} from "@/communication/EventComms";
 import {TradeInterface} from "@/interface/TradeInterface";
+import {TradeMocks} from "@/mocks/EventMocks";
 
-export async function SubmitTrade(event: EventInterface): Promise<string | null> {
-    return "";
+export async function SubmitTrade(event: EventInterface): Promise<void> {
+    throw new Error('Not implemented');
 }
 
-async function FetchTrades(collectionId: string): Promise<TradeInterface[]> {
+async function FetchTrade(collectionId: string): Promise<TradeInterface[]> {
     const tradesRes = await aptosClient().view<[string]>({
         payload: {
             function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_trades`,
@@ -25,14 +26,16 @@ async function FetchTrades(collectionId: string): Promise<TradeInterface[]> {
     return trades;
 }
 
-export async function GetTrades(): Promise<EventInterface[] | null> {
+export async function FetchTrades(): Promise<EventInterface[]> {
+    return TradeMocks;
+
     const allTrades: EventInterface[] = [];
 
     try {
         const events = await FetchEvents();
 
         for (const event of events) {
-            const trades = await FetchTrades(event.collectionID);
+            const trades = await FetchTrade(event.collectionID);
 
             for (const trade of trades) {
                 const tradeEvent: EventInterface = { ...event };
@@ -46,11 +49,11 @@ export async function GetTrades(): Promise<EventInterface[] | null> {
 
         return allTrades;
     } catch (e) {
-        console.log(e);
-        return null;
+        console.error("Error fetching trades: ", e);
+        throw e;
     }
 }
 
-export async function AcceptTrade(tradeId: string): Promise<boolean> {
-    return true;
+export async function AcceptTrade(event: EventInterface): Promise<void> {
+    throw new Error('Not implemented');
 }

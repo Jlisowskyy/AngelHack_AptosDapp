@@ -3,18 +3,19 @@
 import React, {useEffect, useState} from "react";
 import LoadingComponent from "@/components/LoadingComponent";
 import EventListComponent from "@/components/EventListComponent";
-import {TradeMocks} from "@/mocks/EventMocks";
 import {EventInterface} from "@/interface/EventInterface";
 import ModalPopup from "@/components/ModalPopup";
 import {Ripple} from "react-ripple-click";
+import {AcceptTrade, FetchTrades} from "@/communication/TradeComms";
 
-const ProcessPurchase = ({data}: { data: EventInterface }) => {
-    console.log(data);
+const TradeTicket = ({data}: { data: EventInterface }) => {
+    console.log(`Trading ticket with: ${data.tradeSeller} for ${data.tradePrice}`);
+    AcceptTrade(data).then(() => {
+        console.log(`Trade with ${data.tradeSeller} for ${data.tradePrice} was successful`);
+    }).catch((error) => {
+        console.error(`Trade with ${data.tradeSeller} for ${data.tradePrice} failed: ${error}`);
+    });
 };
-
-const LoadTrades =  async () => {
-    console.log("Loading trades...");
-}
 
 const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventInterface | null }) => {
     return (
@@ -27,7 +28,7 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
                     " font-bold py-2 px-4 rounded text-2xl relative isolate overflow-hidden"}
                 onClick={() => {
                     if (data !== null) {
-                        ProcessPurchase({data});
+                        TradeTicket({data});
                     }
 
                     closeModal();
@@ -42,12 +43,20 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
 
 const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({onLoad, onError}) => {
     const [data, setData] = useState<EventInterface | null>(null);
+    const [trades, setTrades] = useState<EventInterface[]>([]);
 
     useEffect(() => {
-        // Simulate an asynchronous operation
+        FetchTrades().then((trades) => {
+            setTrades(trades);
+            // onLoad();
+        }).catch((error) => {
+            console.error(error);
+            onError();
+        });
+
         const timer = setTimeout(() => {
             onLoad();
-        }, 1500); // 3 seconds delay
+        }, 1000);
 
         return () => clearTimeout(timer);
     }, [onLoad, onError]);
@@ -60,7 +69,7 @@ const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({on
         >
             {(openModal) => (
                 <EventListComponent
-                    data={TradeMocks}
+                    data={trades}
                     isTrade={true}
                     buttonText={"Process trade"}
                     click={(data: EventInterface) => {
