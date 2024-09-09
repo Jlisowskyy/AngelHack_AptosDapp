@@ -7,9 +7,13 @@ import {InputTransactionData} from "@aptos-labs/wallet-adapter-react";
 import {useWallet} from "@aptos-labs/wallet-adapter-react";
 import {GetAptosClient} from "@/utils/GetAptosClient";
 import {AccountInfo} from "@aptos-labs/wallet-adapter-core";
-import {ApolloClient, gql, InMemoryCache, useQuery} from '@apollo/client';
+import {ApolloClient, gql, InMemoryCache} from '@apollo/client';
 
-export async function SubmitEvent(event: EventInterface): Promise<EventInterface | null> {
+export async function SubmitEvent(event: EventInterface): Promise<void> {
+    throw new Error('Not implemented');
+}
+
+export async function SubmitEventToDB(event: EventInterface): Promise<EventInterface | null> {
     try {
         const response = await fetch('/api/save-event', {
             method: 'POST',
@@ -33,11 +37,7 @@ export async function SubmitEvent(event: EventInterface): Promise<EventInterface
     }
 }
 
-function removeHexPrefix(hexString: string) {
-    return hexString.slice(2);
-}
-
-export async function FetchEvents(): Promise<EventInterface[]> {
+export async function FetchEventsFromDB(): Promise<EventInterface[]> {
     try {
         const response = await fetch('/api/get-events', {
             method: 'GET',
@@ -71,12 +71,20 @@ const ApolloClientInstance = new ApolloClient({
     cache: new InMemoryCache(),
 });
 
-export async function FetchTickets(account: AccountInfo | null): Promise<EventInterface[]> {
-    if (!account) {
-        throw new Error('Wallet not connected');
-    }
+interface NFT {
+    collectionId: string;
+    tokenId: string;
+}
 
+export async function FetchTickets(account: AccountInfo | null): Promise<EventInterface[]> {
+    // should return list of collection IDs
     async function fetchNfts() {
+        const tokens: NFT[] = [];
+
+        if (!account) {
+            throw new Error('Wallet not connected');
+        }
+
         const addr = account.address.slice(8);
         console.log(addr);
 
@@ -111,16 +119,45 @@ export async function FetchTickets(account: AccountInfo | null): Promise<EventIn
         `;
 
         try {
+            // TODO: NOT WORKING QUERY
             const {data} = await ApolloClientInstance.query({query: GET_ACCOUNT_NFTS});
 
             console.log(data);
+
+            // TODO: PARSE TOKENS
+
+            return tokens;
         } catch (err) {
             console.error('Error fetching NFTs. Please try again.');
             console.error(err);
+
+            throw err;
         }
     }
 
-    // await fetchNfts();
+    async function FilterNfts() {
+        const nfts = await fetchNfts();
+        const events = await FetchEventsFromDB();
+        const returnEvents: EventInterface[] = [];
+
+        for (const event of events) {
+            for (const nft of nfts) {
+                if (nft.collectionId === event.collectionID) {
+                    const ticket: EventInterface = { ...event };
+
+                    ticket.tradeTokenId = nft.tokenId;
+                    returnEvents.push(event);
+                }
+            }
+
+        }
+
+        return returnEvents;
+    }
+
+    // TODO:
+    // return await FilterNfts();
+
     return TicketMocks;
 }
 

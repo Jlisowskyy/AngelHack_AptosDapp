@@ -2,16 +2,16 @@
 
 import BlankPage from "@/components/BlankPage";
 import {EventMocks} from "@/mocks/EventMocks";
-import {SubmitEvent, FetchEvents} from "@/communication/EventComms";
+import {SubmitEventToDB, FetchEventsFromDB} from "@/communication/EventComms";
 
 function TestAppend() {
     for (let i = 0; i < EventMocks.length; i++) {
-        SubmitEvent(EventMocks[i]);
+        SubmitEventToDB(EventMocks[i]);
     }
 }
 
 function TestFetch() {
-    FetchEvents().then((events) => {
+    FetchEventsFromDB().then((events) => {
         console.log(events);
     });
 }

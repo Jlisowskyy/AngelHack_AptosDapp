@@ -6,7 +6,7 @@ import EventListComponent from "@/components/EventListComponent";
 import {EventInterface} from "@/interface/EventInterface";
 import ModalPopup from "@/components/ModalPopup";
 import {Ripple} from "react-ripple-click";
-import {BuyTicket, FetchEvents} from "@/communication/EventComms";
+import {BuyTicket, FetchEventsFromDB} from "@/communication/EventComms";
 import {ShowNotification} from "@/components/NotificationService";
 
 const ProcessPurchase = async ({data}: { data: EventInterface }) => {
@@ -47,7 +47,7 @@ const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({on
     const [data, setData] = useState<EventInterface | null>(null);
 
     useEffect(() => {
-        FetchEvents().then((events) => {
+        FetchEventsFromDB().then((events) => {
             setEvents(events);
             onLoad();
         }).catch((error) => {

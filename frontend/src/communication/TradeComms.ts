@@ -3,7 +3,7 @@ import {AccountAddress} from "@aptos-labs/ts-sdk";
 import {GetAptosClient} from "@/utils/GetAptosClient";
 import {EventInterface} from '@/interface/EventInterface';
 import {MODULE_ADDRESS} from "@/utils/GetAptosClient";
-import {FetchEvents} from "@/communication/EventComms";
+import {FetchEventsFromDB} from "@/communication/EventComms";
 import {TradeInterface} from "@/interface/TradeInterface";
 import {TradeMocks} from "@/mocks/EventMocks";
 
@@ -32,7 +32,7 @@ export async function FetchTrades(): Promise<EventInterface[]> {
     const allTrades: EventInterface[] = [];
 
     try {
-        const events = await FetchEvents();
+        const events = await FetchEventsFromDB();
 
         for (const event of events) {
             const trades = await FetchTrade(event.collectionID);
