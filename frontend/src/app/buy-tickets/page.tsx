@@ -7,12 +7,15 @@ import {EventInterface} from "@/interface/EventInterface";
 import ModalPopup from "@/components/ModalPopup";
 import {Ripple} from "react-ripple-click";
 import {BuyTicket, FetchEvents} from "@/communication/EventComms";
+import {ShowNotification} from "@/components/NotificationService";
 
 const ProcessPurchase = async ({data}: { data: EventInterface }) => {
     console.log(`Buying ticket for: ${data}`);
     BuyTicket(data).then(() => {
+        ShowNotification('success', "Ticket bought successfully");
         console.log("Ticket bought successfully");
     }).catch((error) => {
+        ShowNotification('error', "Ticket purchase failed");
         console.error("Error buying ticket: ", error);
     });
 };

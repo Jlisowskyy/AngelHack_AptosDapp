@@ -1,12 +1,17 @@
 'use client';
-import React from 'react';
-import { useNotification } from '@/components/NotificationContext'
+import React, {useEffect} from 'react';
+import {useNotification} from '@/components/NotificationContext';
+import {setNotificationHandler} from '@/components/NotificationService';
 
 export const NotificationComponent: React.FC = () => {
-    const { notifications, removeNotification } = useNotification();
+    const {notifications, removeNotification, addNotification} = useNotification();
+
+    useEffect(() => {
+        setNotificationHandler(addNotification);
+    }, [addNotification]);
 
     return (
-        <div className="fixed top-4 right-4 z-50">
+        <div className="fixed bottom-4 left-4 z-50">
             {notifications.map((notification) => (
                 <div
                     key={notification.id}
@@ -17,15 +22,10 @@ export const NotificationComponent: React.FC = () => {
                                 ? 'bg-red-500'
                                 : 'bg-blue-500'
                     } text-white`}
+                    onClick={() => removeNotification(notification.id)}
                 >
                     <div className="flex justify-between items-center">
                         <span>{notification.message}</span>
-                        <button
-                            onClick={() => removeNotification(notification.id)}
-                            className="ml-4 text-white hover:text-gray-200"
-                        >
-                            &times;
-                        </button>
                     </div>
                 </div>
             ))}

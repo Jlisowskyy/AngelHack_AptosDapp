@@ -1,7 +1,7 @@
 'use client';
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
-type NotificationType = 'success' | 'error' | 'info';
+export type NotificationType = 'success' | 'error' | 'info';
 
 interface Notification {
     id: number;

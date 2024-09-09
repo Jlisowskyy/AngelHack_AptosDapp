@@ -8,6 +8,7 @@ import ModalPopup from "@/components/ModalPopup";
 import {Ripple} from "react-ripple-click";
 import {FetchTickets} from "@/communication/EventComms";
 import {SubmitTrade} from "@/communication/TradeComms";
+import {ShowNotification} from "@/components/NotificationService";
 
 const SellTicket = ({data, price, name}: { data: EventInterface; price: number; name: string }) => {
     data.tradeSeller = name;
@@ -15,8 +16,10 @@ const SellTicket = ({data, price, name}: { data: EventInterface; price: number; 
 
     console.log(`Selling ticket for ${data.title} at price ${price} with name ${name}`);
     SubmitTrade(data).then(() => {
+        ShowNotification("success", "Trade submitted successfully");
         console.log("Trade submitted successfully");
     }).catch((error) => {
+        ShowNotification("error", "Trade submission failed");
         console.error("Error submitting trade: ", error);
     });
 };
