@@ -51,7 +51,7 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
 
 
     const validateAndSetTradePrice = (value: string) => {
-        const newPrice = parseInt(value);
+        const newPrice = parseFloat(value);
         if (isNaN(newPrice)) {
             setError('Please enter a valid number');
         } else if (newPrice < 0) {
@@ -91,7 +91,7 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
                             type={"number"}
                             min={0}
                             max={data.price}
-                            step={1}
+                            step={0.0001}
                             value={tradePrice}
                             className={"h-10 text-center bg-gray-200 rounded-lg appearance-none cursor-pointer mb-1 w-full"}
                             onChange={(e) => validateAndSetTradePrice(e.target.value)}
@@ -109,16 +109,22 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
                     </div>
                 </div>
 
-                <input
-                    id={"slider"}
-                    type={"range"}
-                    min={0}
-                    max={data.price}
-                    step={1}
-                    value={tradePrice}
-                    className={"w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mb-1"}
-                    onChange={(e) => validateAndSetTradePrice(e.target.value)}
-                />
+
+                <div className={"flex flex-row w-full items-center"}>
+                    <span className={"font-bold text-xl leading-none mr-2"}>0</span>
+                    <input
+                        id={"slider"}
+                        type={"range"}
+                        min={0}
+                        max={data.price}
+                        step={0.0001}
+                        value={tradePrice}
+                        className={"w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer mb-1"}
+                        onChange={(e) => validateAndSetTradePrice(e.target.value)}
+                    />
+                    <span className={"ml-2 text-xl leading-none font-bold"}>{data.price}</span>
+                </div>
+
                 <p className={"text-red-500 text-sm h-[2rem]"}>{error !== null ? error : ""}</p>
             </section>
 

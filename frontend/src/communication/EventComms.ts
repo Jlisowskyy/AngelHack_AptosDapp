@@ -128,12 +128,14 @@ export async function FetchEventsFromDB(): Promise<EventInterface[]> {
     }
 }
 
-const APTOS_INDEXER_URL = 'https://api.testnet.aptoslabs.com/v1/graphql';
-
-const ApolloClientInstance = new ApolloClient({
-    uri: APTOS_INDEXER_URL,
-    cache: new InMemoryCache(),
-});
+// TODO:
+const ApolloClientInstance = null;
+// const APTOS_INDEXER_URL = 'https://api.testnet.aptoslabs.com/v1/graphql';
+//
+// const ApolloClientInstance = new ApolloClient({
+//     uri: APTOS_INDEXER_URL,
+//     cache: new InMemoryCache(),
+// });
 
 interface NFT {
     collectionId: string;

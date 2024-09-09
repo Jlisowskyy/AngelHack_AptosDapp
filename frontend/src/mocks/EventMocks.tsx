@@ -11,7 +11,7 @@ export const EventMocks: EventInterface[] = [
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
         ticketsLeft: 100,
         ticketsTrades: 10,
-        price: 100
+        price: 1
     },
     {
         collectionID: "2",
@@ -23,7 +23,7 @@ export const EventMocks: EventInterface[] = [
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
         ticketsLeft: 200,
         ticketsTrades: 20,
-        price: 200
+        price: 2
     },
     {
         collectionID: "3",
@@ -35,7 +35,7 @@ export const EventMocks: EventInterface[] = [
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
         ticketsLeft: 300,
         ticketsTrades: 30,
-        price: 300
+        price: 3
     },
 ];
 
@@ -50,8 +50,8 @@ export const TradeMocks: EventInterface[] = [
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
         ticketsLeft: 200,
         ticketsTrades: 20,
-        price: 200,
-        tradePrice: 150,
+        price: 2,
+        tradePrice: 1.5,
         tradeSeller: "Johny"
     },
     {
@@ -64,8 +64,8 @@ export const TradeMocks: EventInterface[] = [
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
         ticketsLeft: 300,
         ticketsTrades: 30,
-        price: 300,
-        tradePrice: 250,
+        price: 3,
+        tradePrice: 2.5,
         tradeSeller: "Adam"
     }
 ];
@@ -81,7 +81,7 @@ export const TicketMocks: EventInterface[] = [
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
         ticketsLeft: 300,
         ticketsTrades: 30,
-        price: 300
+        price: 3
     },
     {
         collectionID: "2",
@@ -93,6 +93,6 @@ export const TicketMocks: EventInterface[] = [
         link: "https://www.youtube.com/watch?v=SDPSjup6yK8",
         ticketsLeft: 100,
         ticketsTrades: 10,
-        price: 100
+        price: 1
     },
 ];

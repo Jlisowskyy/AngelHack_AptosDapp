@@ -6,8 +6,16 @@ import {MODULE_ADDRESS} from "@/utils/GetAptosClient";
 import {FetchEventsFromDB} from "@/communication/EventComms";
 import {TradeInterface} from "@/interface/TradeInterface";
 import {TradeMocks} from "@/mocks/EventMocks";
+import {convertAmountFromHumanReadableToOnChain, APT_DECIMALS} from "@/utils/helpers";
+
 
 export async function SubmitTrade(event: EventInterface): Promise<void> {
+    if (!event.tradePrice) {
+        throw new Error('Trade price is required');
+    }
+
+    const onChainPrice = convertAmountFromHumanReadableToOnChain(event.tradePrice, APT_DECIMALS);
+
     throw new Error('Not implemented');
 }
 
