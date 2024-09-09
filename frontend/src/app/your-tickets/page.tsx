@@ -9,6 +9,7 @@ import {Ripple} from "react-ripple-click";
 import {FetchTickets} from "@/communication/EventComms";
 import {SubmitTrade} from "@/communication/TradeComms";
 import {ShowNotification} from "@/components/NotificationService";
+import {useWallet} from "@aptos-labs/wallet-adapter-react";
 
 const SellTicket = ({data, price, name}: { data: EventInterface; price: number; name: string }) => {
     data.tradeSeller = name;
@@ -145,13 +146,15 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
 };
 
 const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({onLoad, onError}) => {
+    const {account} = useWallet();
+
     const [data, setData] = useState<EventInterface | null>(null);
     const [tickets, setTickets] = useState<EventInterface[]>([]);
 
     useEffect(() => {
         console.log("Fetching tickets...");
 
-        FetchTickets().then((events) => {
+        FetchTickets(account).then((events) => {
             setTickets(events);
             // onLoad();
         }).catch((error) => {

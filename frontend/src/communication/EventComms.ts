@@ -5,8 +5,9 @@ import {GetTicketsLeft, GetTicketsTrades} from "@/communication/UtilComms";
 import {TicketMocks} from "@/mocks/EventMocks";
 import {InputTransactionData} from "@aptos-labs/wallet-adapter-react";
 import {useWallet} from "@aptos-labs/wallet-adapter-react";
-import {aptosClient} from "@/utils/AptosClient";
-
+import {GetAptosClient} from "@/utils/GetAptosClient";
+import {AccountInfo} from "@aptos-labs/wallet-adapter-core";
+import {ApolloClient, gql, InMemoryCache, useQuery} from '@apollo/client';
 
 export async function SubmitEvent(event: EventInterface): Promise<EventInterface | null> {
     try {
@@ -30,6 +31,10 @@ export async function SubmitEvent(event: EventInterface): Promise<EventInterface
         console.error('Error submitting event:', error);
         return null;
     }
+}
+
+function removeHexPrefix(hexString: string) {
+    return hexString.slice(2);
 }
 
 export async function FetchEvents(): Promise<EventInterface[]> {
@@ -59,7 +64,63 @@ export async function FetchEvents(): Promise<EventInterface[]> {
     }
 }
 
-export async function FetchTickets(): Promise<EventInterface[]> {
+const APTOS_INDEXER_URL = 'https://api.testnet.aptoslabs.com/v1/graphql';
+
+const ApolloClientInstance = new ApolloClient({
+    uri: APTOS_INDEXER_URL,
+    cache: new InMemoryCache(),
+});
+
+export async function FetchTickets(account: AccountInfo | null): Promise<EventInterface[]> {
+    if (!account) {
+        throw new Error('Wallet not connected');
+    }
+
+    async function fetchNfts() {
+        const addr = account.address.slice(8);
+        console.log(addr);
+
+        const GET_ACCOUNT_NFTS = gql`
+          query GetAccountNfts {
+            current_token_ownerships_v2(
+              where: {owner_address: {_eq: ${addr}, amount: {_gt: "0"}}
+            ) {
+              current_token_data {
+                collection_id
+                largest_property_version_v1
+                current_collection {
+                  collection_id
+                  collection_name
+                  description
+                  creator_address
+                  uri
+                  __typename
+                }
+                description
+                token_name
+                token_data_id
+                token_standard
+                token_uri
+                __typename
+              }
+              owner_address
+              amount
+              __typename
+            }
+          }
+        `;
+
+        try {
+            const {data} = await ApolloClientInstance.query({query: GET_ACCOUNT_NFTS});
+
+            console.log(data);
+        } catch (err) {
+            console.error('Error fetching NFTs. Please try again.');
+            console.error(err);
+        }
+    }
+
+    // await fetchNfts();
     return TicketMocks;
 }
 
@@ -80,7 +141,7 @@ export const MintNFTRequest = (args: MintNftArguments): InputTransactionData => 
 };
 
 export async function BuyTicket(event: EventInterface): Promise<void> {
-    // throw new Error('Not implemented');
+    throw new Error('Not implemented');
 
     const {account, signAndSubmitTransaction} = useWallet();
 
@@ -89,7 +150,7 @@ export async function BuyTicket(event: EventInterface): Promise<void> {
     }
 
     const response = await signAndSubmitTransaction(
-        MintNFTRequest({ collectionId: event.collectionID, amount: 1 }),
+        MintNFTRequest({collectionId: event.collectionID, amount: 1}),
     );
-    await aptosClient().waitForTransaction({ transactionHash: response.hash });
+    await GetAptosClient().waitForTransaction({transactionHash: response.hash});
 }

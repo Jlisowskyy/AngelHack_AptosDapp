@@ -1,8 +1,8 @@
 'use client';
 import {AccountAddress} from "@aptos-labs/ts-sdk";
-import {aptosClient} from "@/utils/AptosClient";
+import {GetAptosClient} from "@/utils/GetAptosClient";
 import {EventInterface} from '@/interface/EventInterface';
-import {MODULE_ADDRESS} from "@/utils/AptosClient";
+import {MODULE_ADDRESS} from "@/utils/GetAptosClient";
 import {FetchEvents} from "@/communication/EventComms";
 import {TradeInterface} from "@/interface/TradeInterface";
 import {TradeMocks} from "@/mocks/EventMocks";
@@ -12,7 +12,7 @@ export async function SubmitTrade(event: EventInterface): Promise<void> {
 }
 
 async function FetchTrade(collectionId: string): Promise<TradeInterface[]> {
-    const tradesRes = await aptosClient().view<[string]>({
+    const tradesRes = await GetAptosClient().view<[string]>({
         payload: {
             function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_trades`,
             functionArguments: [collectionId],

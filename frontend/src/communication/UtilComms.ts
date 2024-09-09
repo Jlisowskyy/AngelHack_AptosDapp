@@ -1,12 +1,12 @@
 'use client';
-import {aptosClient, MODULE_ADDRESS} from "@/utils/AptosClient";
+import {GetAptosClient, MODULE_ADDRESS} from "@/utils/GetAptosClient";
 import {AccountAddress} from "@aptos-labs/ts-sdk";
 
 export async function GetTicketsLeft(collectionId: string): Promise<number | null> {
     return 0;
 
     try{
-        const ticketsLeftRes = await aptosClient().view<[string]>({
+        const ticketsLeftRes = await GetAptosClient().view<[string]>({
             payload: {
                 function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_tickets_left`,
                 functionArguments: [collectionId],
@@ -26,7 +26,7 @@ export async function GetTicketsTrades(collectionId: string): Promise<number | n
     return 0;
 
     try{
-        const numTradesRes = await aptosClient().view<[string]>({
+        const numTradesRes = await GetAptosClient().view<[string]>({
             payload: {
                 function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_num_ticket_trades`,
                 functionArguments: [collectionId],
