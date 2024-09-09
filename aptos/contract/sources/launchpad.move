@@ -23,6 +23,12 @@ module launchpad_addr::launchpad {
     use minter::mint_stage;
     use minter::collection_components;
 
+    use aptos_std::table;
+
+    use aptos_framework::coin::{Coin, transfer};
+    use aptos_framework::account;
+    // use aptos_std::signer as aptos_std_signer;
+
     /// Only admin can update creator
     const EONLY_ADMIN_CAN_UPDATE_CREATOR: u64 = 1;
     /// Only admin can set pending admin
@@ -144,7 +150,115 @@ module launchpad_addr::launchpad {
             mint_fee_collector_addr: signer::address_of(sender),
         });
     }
+    // =========================== pls dzialaj =================================//
 
+//      public(friend) fun swap(
+//       pool: Object<LiquidityPool>,
+//       from_fungible: FungibleAsset,  // The fungible token (e.g., Aptos Coin)
+//       desired_nft_id: u64,           // The ID of the desired NFT
+//   ): NonFungibleAsset acquires FeesAccounting, LiquidityPool, LiquidityPoolConfigs {
+//       // Ensure the pool has the NFT you're trying to swap for
+//       let pool_data = liquidity_pool_data(&pool);
+
+//       // Retrieve fees accounting for the transaction
+//       let fees_accounting = unchecked_mut_fees_accounting(&pool);
+//       let swap_signer = &package_manager::get_signer();
+
+//       // Calculate fees based on fungible token amount
+//       let fees_amount = calculate_fees(from_fungible);  // Assume this function calculates fees.
+//       let nft_store = pool_data.nft_store;
+
+//       // Ensure the NFT exists in the pool (and is available for swap)
+//       let nft = non_fungible_asset::get_nft(nft_store, desired_nft_id);
+//       assert!(non_fungible_asset::is_available(nft), 0x1);  // Error if NFT isn't available.
+
+//       // Deposit the fungible token (Aptos Coin) into the pool
+//       let store_fungible = pool_data.fungible_store;  // Store for fungible tokens (Aptos)
+//       fungible_asset::deposit(store_fungible, from_fungible);
+
+//       // Add a portion of the fungible token to the fees pool
+//       let fees_store_fungible = pool_data.fees_store_fungible;
+//       fungible_asset::deposit(fees_store_fungible, fees_amount);
+
+//       // Update fees accounting
+//       fees_accounting.total_fees_fungible = fees_accounting.total_fees_fungible + fees_amount;
+
+//       // Transfer the NFT from the pool to the user
+//       let out_nft = non_fungible_asset::withdraw(swap_signer, nft_store, desired_nft_id);
+
+//       // Return the swapped NFT to the user
+//       out_nft
+//   }
+
+    // ================================= swap ==================================//
+    // struct Swap has store {
+    //     coin_owner: address,
+    //     nft_owner: address,
+    //     amount: u64,
+    // }
+
+    // // Stores the locked swap info
+    // struct SwapInfo has key {
+    //     pending_swaps: table::Table<address, Swap>
+    // }
+
+    // public fun init_account(nft_owner: &signer) {
+    //     let nft_owner_addr = signer::address_of(nft_owner);
+
+    //     if (!exists<SwapInfo>(nft_owner_addr)) {
+    //         let swap_table = table::new<address, Swap>();
+    //         move_to(nft_owner, SwapInfo {
+    //             pending_swaps: swap_table,
+    //         });
+    //     }
+    // }
+
+    // // Step 1: CoinOwner locks coins for the NFT swap
+    // public entry fun lock_coins_for_nft_swap(
+    //     coin_owner: &signer,
+    //     nft_owner_addr: address,
+    //     amount: u64
+    // ) {
+    //     let coin_owner_addr = signer::address_of(coin_owner);
+
+    //     // Transfer coins to the nft_owner (or keep them in a separate locked pool)
+    //     transfer<AptosCoin>(coin_owner, nft_owner_addr, amount);
+
+    //     // Check if the nft_owner has SwapInfo
+    //     let swap_info = borrow_global_mut<SwapInfo>(nft_owner_addr);
+    //     table::add(&mut swap_info.pending_swaps, coin_owner_addr, Swap {
+    //         coin_owner: coin_owner_addr,
+    //         nft_owner: nft_owner_addr,
+    //         amount
+    //     });
+    // }
+
+    // // Step 2: NftOwner completes the NFT transfer and the coin transfer is confirmed
+    // public entry fun complete_nft_swap(
+    //     nft_owner: &signer,
+    //     coin_owner_addr: address,
+    //     creator: address,
+    //     collection: String,
+    //     name: String,
+    //     property_version: u64
+    // ) {
+    //     let nft_owner_addr = signer::address_of(nft_owner);
+
+    //     // Access the swap info table
+    //     let swap_info = borrow_global_mut<SwapInfo>(nft_owner_addr);
+
+    //     // Ensure there's a pending swap for this coin_owner
+    //     assert!(table::contains(&swap_info.pending_swaps, coin_owner_addr), 1);
+    //     let swap = table::remove(&mut swap_info.pending_swaps, coin_owner_addr);
+
+    //     // Create the token ID for the NFT
+    //     let token_id = TokenAp::create_token_id_raw(creator, collection, name, property_version);
+
+    //     // Transfer the NFT from the nft_owner to the coin_owner
+    //     TokenAp::transfer(nft_owner, token_id, coin_owner_addr, 1);
+
+    //     // The coins have already been transferred in the lock phase
+    // }
     // ================================= Entry Functions ================================= //
 
     /// Update creator address
