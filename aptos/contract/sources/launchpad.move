@@ -3,8 +3,6 @@ module launchpad_addr::launchpad {
     use std::signer;
     use std::string::{Self, String};
     use std::vector;
-    use aptos_framework::coin;
-    use aptos_framework::aptos_coin::AptosCoin;
 
     use aptos_std::simple_map::{Self, SimpleMap};
     use aptos_std::string_utils;
@@ -16,18 +14,11 @@ module launchpad_addr::launchpad {
 
     use aptos_token_objects::collection::{Self, Collection};
     use aptos_token_objects::royalty::{Self, Royalty};
-    use aptos_token_objects::token as TokenObject;
-    use aptos_token::token as TokenAp;
+    use aptos_token_objects::token::{Self, Token};
 
     use minter::token_components;
     use minter::mint_stage;
     use minter::collection_components;
-
-    use aptos_std::table;
-
-    use aptos_framework::coin::{Coin, transfer};
-    use aptos_framework::account;
-    // use aptos_std::signer as aptos_std_signer;
 
     /// Only admin can update creator
     const EONLY_ADMIN_CAN_UPDATE_CREATOR: u64 = 1;
@@ -69,6 +60,16 @@ module launchpad_addr::launchpad {
     /// Category for public mint stage
     const PUBLIC_MINT_MINT_STAGE_CATEGORY: vector<u8> = b"Public mint stage";
 
+    const TRADE_STATUS_OPEN: u64 = 0;
+    const TRADE_STATUS_CLOSED: u64 = 1;
+
+
+    struct TradeOffer has store, drop {
+        price: u64,
+        seller: address,
+        status: u64,
+    }
+
     #[event]
     struct CreateCollectionEvent has store, drop {
         creator_addr: address,
@@ -93,7 +94,7 @@ module launchpad_addr::launchpad {
     #[event]
     struct BatchMintNftsEvent has store, drop {
         collection_obj: Object<Collection>,
-        nft_objs: vector<Object<TokenObject::Token>>,
+        nft_objs: vector<Object<Token>>,
         recipient_addr: address,
         total_mint_fee: u64,
     }
@@ -101,7 +102,7 @@ module launchpad_addr::launchpad {
     #[event]
     struct BatchPreMintNftsEvent has store, drop {
         collection_obj: Object<Collection>,
-        nft_objs: vector<Object<TokenObject::Token>>,
+        nft_objs: vector<Object<Token>>,
         recipient_addr: address,
     }
 
@@ -127,6 +128,19 @@ module launchpad_addr::launchpad {
         collection_objects: vector<Object<Collection>>
     }
 
+    struct Trade has store, copy, drop {
+        trade_id: u64,
+        price: u64,
+        seller: address,
+        collection_address: address,
+        status: u64,
+    }
+
+    /// Global per contract
+    struct TradeManager has key {
+        trades: vector<Trade>, 
+    }
+
     /// Global per contract
     struct Config has key {
         // creator can create collection
@@ -149,116 +163,14 @@ module launchpad_addr::launchpad {
             pending_admin_addr: option::none(),
             mint_fee_collector_addr: signer::address_of(sender),
         });
+        // Create global vector for collections
+
+        let trade_manager = TradeManager {
+            trades: vector::empty<Trade>(),
+        };
+        move_to(sender, trade_manager);
     }
-    // =========================== pls dzialaj =================================//
 
-//      public(friend) fun swap(
-//       pool: Object<LiquidityPool>,
-//       from_fungible: FungibleAsset,  // The fungible token (e.g., Aptos Coin)
-//       desired_nft_id: u64,           // The ID of the desired NFT
-//   ): NonFungibleAsset acquires FeesAccounting, LiquidityPool, LiquidityPoolConfigs {
-//       // Ensure the pool has the NFT you're trying to swap for
-//       let pool_data = liquidity_pool_data(&pool);
-
-//       // Retrieve fees accounting for the transaction
-//       let fees_accounting = unchecked_mut_fees_accounting(&pool);
-//       let swap_signer = &package_manager::get_signer();
-
-//       // Calculate fees based on fungible token amount
-//       let fees_amount = calculate_fees(from_fungible);  // Assume this function calculates fees.
-//       let nft_store = pool_data.nft_store;
-
-//       // Ensure the NFT exists in the pool (and is available for swap)
-//       let nft = non_fungible_asset::get_nft(nft_store, desired_nft_id);
-//       assert!(non_fungible_asset::is_available(nft), 0x1);  // Error if NFT isn't available.
-
-//       // Deposit the fungible token (Aptos Coin) into the pool
-//       let store_fungible = pool_data.fungible_store;  // Store for fungible tokens (Aptos)
-//       fungible_asset::deposit(store_fungible, from_fungible);
-
-//       // Add a portion of the fungible token to the fees pool
-//       let fees_store_fungible = pool_data.fees_store_fungible;
-//       fungible_asset::deposit(fees_store_fungible, fees_amount);
-
-//       // Update fees accounting
-//       fees_accounting.total_fees_fungible = fees_accounting.total_fees_fungible + fees_amount;
-
-//       // Transfer the NFT from the pool to the user
-//       let out_nft = non_fungible_asset::withdraw(swap_signer, nft_store, desired_nft_id);
-
-//       // Return the swapped NFT to the user
-//       out_nft
-//   }
-
-    // ================================= swap ==================================//
-    // struct Swap has store {
-    //     coin_owner: address,
-    //     nft_owner: address,
-    //     amount: u64,
-    // }
-
-    // // Stores the locked swap info
-    // struct SwapInfo has key {
-    //     pending_swaps: table::Table<address, Swap>
-    // }
-
-    // public fun init_account(nft_owner: &signer) {
-    //     let nft_owner_addr = signer::address_of(nft_owner);
-
-    //     if (!exists<SwapInfo>(nft_owner_addr)) {
-    //         let swap_table = table::new<address, Swap>();
-    //         move_to(nft_owner, SwapInfo {
-    //             pending_swaps: swap_table,
-    //         });
-    //     }
-    // }
-
-    // // Step 1: CoinOwner locks coins for the NFT swap
-    // public entry fun lock_coins_for_nft_swap(
-    //     coin_owner: &signer,
-    //     nft_owner_addr: address,
-    //     amount: u64
-    // ) {
-    //     let coin_owner_addr = signer::address_of(coin_owner);
-
-    //     // Transfer coins to the nft_owner (or keep them in a separate locked pool)
-    //     transfer<AptosCoin>(coin_owner, nft_owner_addr, amount);
-
-    //     // Check if the nft_owner has SwapInfo
-    //     let swap_info = borrow_global_mut<SwapInfo>(nft_owner_addr);
-    //     table::add(&mut swap_info.pending_swaps, coin_owner_addr, Swap {
-    //         coin_owner: coin_owner_addr,
-    //         nft_owner: nft_owner_addr,
-    //         amount
-    //     });
-    // }
-
-    // // Step 2: NftOwner completes the NFT transfer and the coin transfer is confirmed
-    // public entry fun complete_nft_swap(
-    //     nft_owner: &signer,
-    //     coin_owner_addr: address,
-    //     creator: address,
-    //     collection: String,
-    //     name: String,
-    //     property_version: u64
-    // ) {
-    //     let nft_owner_addr = signer::address_of(nft_owner);
-
-    //     // Access the swap info table
-    //     let swap_info = borrow_global_mut<SwapInfo>(nft_owner_addr);
-
-    //     // Ensure there's a pending swap for this coin_owner
-    //     assert!(table::contains(&swap_info.pending_swaps, coin_owner_addr), 1);
-    //     let swap = table::remove(&mut swap_info.pending_swaps, coin_owner_addr);
-
-    //     // Create the token ID for the NFT
-    //     let token_id = TokenAp::create_token_id_raw(creator, collection, name, property_version);
-
-    //     // Transfer the NFT from the nft_owner to the coin_owner
-    //     TokenAp::transfer(nft_owner, token_id, coin_owner_addr, 1);
-
-    //     // The coins have already been transferred in the lock phase
-    // }
     // ================================= Entry Functions ================================= //
 
     /// Update creator address
@@ -469,29 +381,117 @@ module launchpad_addr::launchpad {
         });
     }
 
-    public entry fun swap_nft_for_coins(
-        nft_owner: &signer,
-        coin_owner: &signer,
-        creator: address,
-        collection: String,
-        name: String,
-        property_version: u64,
-        price: u64
-    ) {
-        let nft_owner_addr = signer::address_of(nft_owner);
-        let coin_owner_addr = signer::address_of(coin_owner);
+    public entry fun submit_trade(
+        sender: &signer,
+        collection_address: address,
+        price: u64,
+    ) acquires TradeManager {
+        // Access the global trade offers storage
+        let trade_manager = borrow_global_mut<TradeManager>(@launchpad_addr);
 
-        // Create the token ID
-        let token_id = TokenAp::create_token_id_raw(creator, collection, name, property_version);
+        // Create trade
+        let trade = Trade {
+            trade_id: vector::length(&trade_manager.trades),
+            price: price,
+            seller: signer::address_of(sender),
+            collection_address,
+            status: TRADE_STATUS_OPEN,
+        };
 
-        // Transfer the NFT from nft_owner to coin_owner
-        TokenAp::transfer(nft_owner, token_id, coin_owner_addr, 1);
-
-        // Transfer the coins from coin_owner to nft_owner
-        coin::transfer<AptosCoin>(coin_owner, nft_owner_addr, price);
+        // Add trade to the collection
+        vector::push_back(&mut trade_manager.trades, trade);
     }
 
+    public entry fun accept_trade(
+        sender: &signer,
+        collection_address: address,
+        collection_obj: Object<Collection>
+    ) acquires TradeManager, CollectionConfig, CollectionOwnerObjConfig {
+        // Access the global trade offers storage
+        let trade_manager = borrow_global_mut<TradeManager>(@launchpad_addr);
+
+        // Find the trade
+        let i = 0;
+        loop {
+            if (i == vector::length(&trade_manager.trades)) {
+                return
+            };
+
+            let trade = vector::borrow(&trade_manager.trades, i);
+            if (trade.collection_address == collection_address && trade.status == TRADE_STATUS_OPEN) {
+                break
+            };
+            i = i + 1;
+        };
+
+        // Close trade
+        let trade = vector::borrow_mut(&mut trade_manager.trades, i);
+
+        // Transfer APT to seller
+        aptos_account::transfer(sender, trade.seller, trade.price);
+
+        // Transfer NFT to buyer
+        let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
+        let collection_owner_obj = collection_config.collection_owner_obj;
+        let collection_owner_config = borrow_global<CollectionOwnerObjConfig>(
+            object::object_address(&collection_owner_obj)
+        );
+        let collection_owner_obj_signer = &object::generate_signer_for_extending(&collection_owner_config.extend_ref);
+
+        
+        let nft_obj = mint_nft_internal(signer::address_of(sender), collection_obj);
+        object::transfer(collection_owner_obj_signer, nft_obj, trade.seller);
+
+        trade.status = TRADE_STATUS_CLOSED;
+    }
+
+    
+
     // ================================= View  ================================= //
+
+    #[view]
+    public fun get_trades(collection_address: address): vector<Trade> acquires TradeManager {
+        // Access the global trade offers storage
+        let trade_manager = borrow_global_mut<TradeManager>(@launchpad_addr);
+
+        let collection_trades = vector::empty<Trade>();
+        let i = 0;
+        loop {
+            if (i == vector::length(&trade_manager.trades)) {
+                break
+            };
+
+            let trade = vector::borrow(&trade_manager.trades, i);
+            if (trade.collection_address == collection_address) {
+                vector::push_back(&mut collection_trades, *trade);
+            };
+            i = i + 1;
+        };
+
+        collection_trades
+    }
+
+    #[view]
+    public fun get_num_ticket_trades(collection_address: address): u64 acquires TradeManager {
+        // Access the global trade offers storage
+        let trade_manager = borrow_global_mut<TradeManager>(@launchpad_addr);
+
+        let collection_trades = vector::empty<Trade>();
+        let i = 0;
+        loop {
+            if (i == vector::length(&trade_manager.trades)) {
+                break
+            };
+
+            let trade = vector::borrow(&trade_manager.trades, i);
+            if (trade.collection_address == collection_address) {
+                vector::push_back(&mut collection_trades, *trade);
+            };
+            i = i + 1;
+        };
+
+        return vector::length(&collection_trades)
+    }
 
     #[view]
     /// Get creator, creator is the address that is allowed to create collections
@@ -721,7 +721,7 @@ module launchpad_addr::launchpad {
     fun mint_nft_internal(
         sender_addr: address,
         collection_obj: Object<Collection>,
-    ): Object<TokenObject::Token> acquires CollectionConfig, CollectionOwnerObjConfig {
+    ): Object<Token> acquires CollectionConfig, CollectionOwnerObjConfig {
         let collection_config = borrow_global<CollectionConfig>(object::object_address(&collection_obj));
 
         let collection_owner_obj = collection_config.collection_owner_obj;
@@ -735,7 +735,7 @@ module launchpad_addr::launchpad {
         let collection_uri = collection::uri(collection_obj);
         let nft_metadata_uri = construct_nft_metadata_uri(&collection_uri, next_nft_id);
 
-        let nft_obj_constructor_ref = &TokenObject::create(
+        let nft_obj_constructor_ref = &token::create(
             collection_owner_obj_signer,
             collection::name(collection_obj),
             // placeholder value, please read description from json metadata in offchain storage
