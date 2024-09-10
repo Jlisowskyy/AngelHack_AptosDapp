@@ -8,8 +8,9 @@ import {useWallet} from "@aptos-labs/wallet-adapter-react";
 import {GetAptosClient} from "@/utils/GetAptosClient";
 import {AccountInfo} from "@aptos-labs/wallet-adapter-core";
 import {ApolloClient, gql, InMemoryCache} from '@apollo/client';
-import { AccountAddressInput } from "@aptos-labs/ts-sdk";
-import { APT_DECIMALS, dateToSeconds, convertAmountFromHumanReadableToOnChain } from "@/utils/helpers";
+import {AccountAddressInput} from "@aptos-labs/ts-sdk";
+import {APT_DECIMALS, dateToSeconds, convertAmountFromHumanReadableToOnChain} from "@/utils/helpers";
+import {MODULE_ADDRESS} from "@/config";
 
 
 export type CreateCollectionArguments = {
@@ -31,6 +32,8 @@ export type CreateCollectionArguments = {
 };
 
 export const GetCreateCollectionRequest = (args: CreateCollectionArguments): InputTransactionData => {
+    console.log(MODULE_ADDRESS);
+
     const {
         collectionDescription,
         collectionName,
@@ -50,7 +53,7 @@ export const GetCreateCollectionRequest = (args: CreateCollectionArguments): Inp
     } = args;
     return {
         data: {
-            function: `${process.env.MODULE_ADDRESS}::launchpad::create_collection`,
+            function: `${MODULE_ADDRESS}::launchpad::create_collection`,
             typeArguments: [],
             functionArguments: [
                 collectionDescription,
@@ -73,19 +76,17 @@ export const GetCreateCollectionRequest = (args: CreateCollectionArguments): Inp
     };
 };
 
-export async function SubmitEvent(event: EventInterface): Promise<void> {
-    throw new Error('Not implemented');
+export async function SubmitEvent(event: EventInterface, signAndSubmitTransaction: any): Promise<void> {
+    // throw new Error('Not implemented');
 
-    const {signAndSubmitTransaction} = useWallet();
+    console.log("Submitting event: ", event);
 
-
-    // Submit a create_collection entry function transaction
     const response = await signAndSubmitTransaction(
         GetCreateCollectionRequest({
             collectionDescription: event.description,
             collectionName: event.title,
-            projectUri: "",
-            maxSupply : event.initialTicketPool || 1,
+            projectUri: event.link,
+            maxSupply: event.initialTicketPool || 1,
             royaltyPercentage: 0,
             preMintAmount: 0,
             allowList: undefined,
@@ -96,13 +97,22 @@ export async function SubmitEvent(event: EventInterface): Promise<void> {
             publicMintStartDate: event.publicMintStartDate,
             publicMintEndDate: event.publicMintEndDate,
             publicMintLimitPerAccount: 1,
-            publicMintFeePerNFT : event.price,
+            publicMintFeePerNFT: event.price,
         }),
     );
+
+    console.log("Transaction sent")
+    console.log(response)
 
     await GetAptosClient().waitForTransaction({
         transactionHash: response.hash,
     });
+
+    console.log("Transaction confirmed")
+
+    console.log("Event submitted")
+    await SubmitEventToDB(event);
+    console.log("Event submitted to DB")
 }
 
 export async function SubmitEventToDB(event: EventInterface): Promise<EventInterface | null> {
@@ -237,7 +247,7 @@ export async function FetchTickets(account: AccountInfo | null): Promise<EventIn
         for (const event of events) {
             for (const nft of nfts) {
                 if (nft.collectionId === event.collectionID) {
-                    const ticket: EventInterface = { ...event };
+                    const ticket: EventInterface = {...event};
 
                     ticket.tradeTokenId = nft.tokenId;
                     returnEvents.push(event);
@@ -264,18 +274,14 @@ export const MintNFTRequest = (args: MintNftArguments): InputTransactionData => 
     const {collectionId, amount} = args;
     return {
         data: {
-            function: `${process.env.MODULE_ADDRESS}::launchpad::mint_nft`,
+            function: `${MODULE_ADDRESS}::launchpad::mint_nft`,
             typeArguments: [],
             functionArguments: [collectionId, amount],
         },
     };
 };
 
-export async function BuyTicket(event: EventInterface): Promise<void> {
-    throw new Error('Not implemented');
-
-    const {account, signAndSubmitTransaction} = useWallet();
-
+export async function BuyTicket(event: EventInterface, account: any, signAndSubmitTransaction: any): Promise<void> {
     if (!account) {
         throw new Error('Wallet not connected');
     }

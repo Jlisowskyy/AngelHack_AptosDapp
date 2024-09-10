@@ -10,7 +10,7 @@ import {ShowNotification} from "@/components/NotificationService";
 import LabeledArea from "@/components/ui/labeled-area";
 
 export default function CreateCollection() {
-    const {account} = useWallet();
+    const {account, signAndSubmitTransaction} = useWallet();
 
     const [publicMintStartDate, setPublicMintStartDate] = useState<Date>();
     const [publicMintStartTime, setPublicMintStartTime] = useState<string>();
@@ -72,8 +72,9 @@ export default function CreateCollection() {
                 initialTicketPool: publicMintLimitPerAccount,
             };
 
-            await SubmitEvent(event);
+            await SubmitEvent(event, signAndSubmitTransaction);
         } catch (error) {
+            console.error("Error creating collection: ", error);
             ShowNotification("error", "Collection creation failed!");
         }
     };
@@ -201,7 +202,7 @@ export default function CreateCollection() {
                             !publicMintLimitPerAccount ||
                             !account
                         }
-                        confirmMessage={"good"}
+                        confirmMessage={"Are you sure you want to create this event?"}
                     />
                 </div>
             </div>

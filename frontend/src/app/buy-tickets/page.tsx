@@ -8,10 +8,15 @@ import ModalPopup from "@/components/ModalPopup";
 import {Ripple} from "react-ripple-click";
 import {BuyTicket, FetchEventsFromDB} from "@/communication/EventComms";
 import {ShowNotification} from "@/components/NotificationService";
+import {useWallet} from "@aptos-labs/wallet-adapter-react";
 
-const ProcessPurchase = async ({data}: { data: EventInterface }) => {
+const ProcessPurchase = async ({data, account, signAndSubmitTransaction}: {
+    data: EventInterface,
+    account: any,
+    signAndSubmitTransaction: any
+}) => {
     console.log(`Buying ticket for: ${data}`);
-    BuyTicket(data).then(() => {
+    BuyTicket(data, account, signAndSubmitTransaction).then(() => {
         ShowNotification('success', "Ticket bought successfully");
         console.log("Ticket bought successfully");
     }).catch((error) => {
@@ -21,6 +26,8 @@ const ProcessPurchase = async ({data}: { data: EventInterface }) => {
 };
 
 const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventInterface | null }) => {
+    const {account, signAndSubmitTransaction} = useWallet();
+
     return (
         <div className={"w-[20rem] h-[12rem] flex flex-col items-center"}>
             <h1 className={"text-5xl font-bold my-3"}>Confirmation</h1>
@@ -30,7 +37,7 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
                     " font-bold py-2 px-4 rounded text-2xl relative isolate overflow-hidden"}
                 onClick={async () => {
                     if (data !== null) {
-                        await ProcessPurchase({data});
+                        await ProcessPurchase({data, account, signAndSubmitTransaction});
                     }
                     closeModal();
                 }}
