@@ -202,7 +202,7 @@ export async function FetchTickets(account: AccountInfo | null): Promise<EventIn
         const addr = account.address.slice(8);
         console.log(addr);
 
-        const GET_ACCOUNT_NFTS = gql`
+        const GET_ACCOUNT_NFTS = `
           query GetAccountNfts {
             current_token_ownerships_v2(
               where: {owner_address: {_eq: ${addr}, amount: {_gt: "0"}}
