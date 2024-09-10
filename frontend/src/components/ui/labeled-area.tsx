@@ -1,18 +1,17 @@
 'use client';
-import {Input} from "@/components/ui/input";
 import {Label} from "@/components/ui/label";
 import {FC} from "react";
+import {cn} from "@/lib/utils";
 
-export const LabeledInput: FC<{
+const LabeledArea: FC<{
     className?: string;
     label: string;
     required?: boolean;
     tooltip: string;
     disabled?: boolean;
     value?: number | string;
-    type?: "number" | "text";
     id: string;
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }> = ({
           label,
           required,
@@ -21,7 +20,6 @@ export const LabeledInput: FC<{
           value,
           onChange,
           id,
-          type = "number",
           className = "",
       }) => {
     return (
@@ -29,14 +27,18 @@ export const LabeledInput: FC<{
             <Label htmlFor={id} tooltip={tooltip}>
                 {label} {required ? "" : "(optional)"}
             </Label>
-            <Input
+            <textarea
                 disabled={disabled}
-                type={type}
                 id={id}
                 value={value}
+                className={cn(
+                    "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-primary file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                    className
+                )}
                 onChange={onChange}
-                className={className}
             />
         </div>
     );
 };
+
+export default LabeledArea;

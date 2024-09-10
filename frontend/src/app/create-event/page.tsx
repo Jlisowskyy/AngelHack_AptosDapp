@@ -6,21 +6,25 @@ import {DateTimeInput} from "@/components/ui/date-time-input";
 import {ConfirmButton} from "@/components/ui/confirm-button";
 import {SubmitEvent} from "@/communication/EventComms";
 import {EventInterface} from "@/interface/EventInterface";
+import {ShowNotification} from "@/components/NotificationService";
+import LabeledArea from "@/components/ui/labeled-area";
 
 export default function CreateCollection() {
-    // Wallet Adapter provider
     const {account} = useWallet();
 
-    // Collection data entered by the user on UI
     const [publicMintStartDate, setPublicMintStartDate] = useState<Date>();
     const [publicMintStartTime, setPublicMintStartTime] = useState<string>();
     const [publicMintEndDate, setPublicMintEndDate] = useState<Date>();
     const [publicMintEndTime, setPublicMintEndTime] = useState<string>();
-    const [publicMintLimitPerAccount, setPublicMintLimitPerAccount] = useState<number>(1);
+    const [publicMintLimitPerAccount, setPublicMintLimitPerAccount] = useState<number>(999);
     const [publicMintFeePerNFT, setPublicMintFeePerNFT] = useState<number>();
+    const [eventDescription, setEventDescription] = useState<string>("No description provided");
+    const [eventLink, setEventLink] = useState<string>("No link provided");
+    const [eventImage, setEventImage] = useState<string>("https://i.imgur.com/gsALUPb.jpeg");
+    const [eventTitle, setEventTitle] = useState<string>("No title provided");
+    const [eventLocation, setEventLocation] = useState<string>("no location provided");
 
 
-    // On publish mint start date selected
     const onPublicMintStartTime = (event: React.ChangeEvent<HTMLInputElement>) => {
         const timeValue = event.target.value;
         setPublicMintStartTime(timeValue);
@@ -33,7 +37,6 @@ export default function CreateCollection() {
         setPublicMintStartDate(publicMintStartDate);
     };
 
-    // On publish mint end date selected
     const onPublicMintEndTime = (event: React.ChangeEvent<HTMLInputElement>) => {
         const timeValue = event.target.value;
         setPublicMintEndTime(timeValue);
@@ -46,24 +49,23 @@ export default function CreateCollection() {
         setPublicMintEndDate(publicMintEndDate);
     };
 
-    // On create collection button clicked
     const onCreateCollection = async () => {
         try {
             if (!account) throw new Error("Please connect your wallet");
 
             const event: EventInterface = {
-                title: "Event Title",
-                description: "Event Description",
-                location: "Event Location",
-                image: "Event Image",
-                link: "Event Link",
-                date: "Event Date",
-                collectionID: "Collection ID",
+                collectionID: "UNDEFINED",
 
                 // no relevant here
                 ticketsLeft: 0,
                 ticketsTrades: 0,
 
+                title: eventTitle,
+                location: eventLocation,
+                image: eventImage,
+                link: eventLink,
+                date: publicMintStartDate?.toString() || "",
+                description: eventDescription,
                 publicMintEndDate: publicMintEndDate,
                 publicMintStartDate: publicMintStartDate,
                 price: publicMintFeePerNFT || 999,
@@ -72,20 +74,56 @@ export default function CreateCollection() {
 
             await SubmitEvent(event);
         } catch (error) {
-            alert(error);
+            ShowNotification("error", "Collection creation failed!");
         }
     };
 
     return (
-        <>
+        <div className={"my-[10vh]"}>
             <div
                 className="flex flex-col md:flex-row items-start justify-between px-4 py-2 gap-4 max-w-screen-xl mx-auto">
                 <div className="w-full md:w-2/3 flex flex-col gap-y-4 order-2 md:order-1">
+                    <LabeledInput
+                        id="title"
+                        required
+                        label="Provide some catchy title for your event"
+                        tooltip="Allow user to quickly understand what your event is about or simply recognize it"
+                        disabled={!account}
+                        onChange={(e) => {
+                            setEventTitle(e.target.value);
+                        }}
+                        type={"text"}
+                    />
+
+                    <LabeledInput
+                        id="location"
+                        required
+                        label="Event location"
+                        tooltip="Let people know where your event is taking place"
+                        disabled={!account}
+                        onChange={(e) => {
+                            setEventLocation(e.target.value);
+                        }}
+                        type={"text"}
+                    />
+
+                    <LabeledArea
+                        id="Description"
+                        required
+                        label="Event description"
+                        tooltip="Provide some details about your event, like what it is about, what people can expect, etc."
+                        disabled={!account}
+                        onChange={(e) => {
+                            setEventDescription(e.target.value);
+                        }}
+                        className={"h-[30vh]"}
+                    />
+
                     <div className="flex item-center gap-4 mt-4">
                         <DateTimeInput
                             id="mint-start"
-                            label="Public mint start date"
-                            tooltip="When minting becomes active"
+                            label="Ticket sell start date"
+                            tooltip="When tickets will be available for purchase"
                             disabled={!account}
                             date={publicMintStartDate}
                             onDateChange={setPublicMintStartDate}
@@ -96,8 +134,8 @@ export default function CreateCollection() {
 
                         <DateTimeInput
                             id="mint-end"
-                            label="Public mint end date"
-                            tooltip="When minting finishes"
+                            label="Ticket sale end date"
+                            tooltip="When tickets will no longer be available for purchase"
                             disabled={!account}
                             date={publicMintEndDate}
                             onDateChange={setPublicMintEndDate}
@@ -108,10 +146,34 @@ export default function CreateCollection() {
                     </div>
 
                     <LabeledInput
-                        id="mint-limit"
+                        id="event-link"
                         required
-                        label="Mint limit per address"
-                        tooltip="How many NFTs an individual address is allowed to mint"
+                        label="Link to your event"
+                        tooltip="Provide some additional materials for buyers"
+                        disabled={!account}
+                        onChange={(e) => {
+                            setEventLink(e.target.value);
+                        }}
+                        type={"text"}
+                    />
+
+                    <LabeledInput
+                        id="img-link"
+                        required
+                        label="Link to your event image"
+                        tooltip="Allow use to quickly recognize your event"
+                        disabled={!account}
+                        onChange={(e) => {
+                            setEventImage(e.target.value);
+                        }}
+                        type={"text"}
+                    />
+
+                    <LabeledInput
+                        id="ticket-pool"
+                        required
+                        label="Amount of tickets in this event"
+                        tooltip="How many tickets will be available for this event"
                         disabled={!account}
                         onChange={(e) => {
                             setPublicMintLimitPerAccount(parseInt(e.target.value));
@@ -120,12 +182,13 @@ export default function CreateCollection() {
 
                     <LabeledInput
                         id="mint-fee"
-                        label="Mint fee per NFT in APT"
-                        tooltip="The fee the nft minter is paying the collection creator when they mint an NFT, denominated in APT"
+                        label="Ticket price"
+                        tooltip="Ticket price denominated in APT"
                         disabled={!account}
                         onChange={(e) => {
                             setPublicMintFeePerNFT(Number(e.target.value));
                         }}
+                        required
                     />
 
                     <ConfirmButton
@@ -142,6 +205,6 @@ export default function CreateCollection() {
                     />
                 </div>
             </div>
-        </>
+        </div>
     );
 }
