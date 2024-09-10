@@ -183,14 +183,7 @@ export async function FetchEventsFromDB(): Promise<EventInterface[]> {
     }
 }
 
-// TODO:
-const ApolloClientInstance = null;
-// const APTOS_INDEXER_URL = 'https://api.testnet.aptoslabs.com/v1/graphql';
-//
-// const ApolloClientInstance = new ApolloClient({
-//     uri: APTOS_INDEXER_URL,
-//     cache: new InMemoryCache(),
-// });
+
 
 interface NFT {
     collectionId: string;
@@ -240,11 +233,16 @@ export async function FetchTickets(account: AccountInfo | null): Promise<EventIn
         `;
 
         try {
-            // TODO: NOT WORKING QUERY
-            const {data} = await ApolloClientInstance.query({query: GET_ACCOUNT_NFTS});
+            const aptosClient = GetAptosClient();
+            const {data} = await aptosClient.queryIndexer(
+                {
+                    query: {
+                        query: GET_ACCOUNT_NFTS,
+                    }
+                }
+            )
 
             console.log(data);
-
             // TODO: PARSE TOKENS
 
             return tokens;
