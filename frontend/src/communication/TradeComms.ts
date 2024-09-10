@@ -3,12 +3,11 @@ import {AccountAddress} from "@aptos-labs/ts-sdk";
 import {InputTransactionData} from "@aptos-labs/wallet-adapter-react";
 import {GetAptosClient} from "@/utils/GetAptosClient";
 import {EventInterface} from '@/interface/EventInterface';
-import {MODULE_ADDRESS} from "@/utils/GetAptosClient";
 import {FetchEventsFromDB} from "@/communication/EventComms";
 import {TradeInterface} from "@/interface/TradeInterface";
-import {TradeMocks} from "@/mocks/EventMocks";
 import {convertAmountFromHumanReadableToOnChain, APT_DECIMALS} from "@/utils/helpers";
 import { TradeApolloInterface } from "@/interface/TradeApolloInterface";
+import {MODULE_ADDRESS} from "@/config";
 
 
 export async function SubmitTrade(event: EventInterface): Promise<void> {
