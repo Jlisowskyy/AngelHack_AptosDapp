@@ -8,10 +8,15 @@ import ModalPopup from "@/components/ModalPopup";
 import {Ripple} from "react-ripple-click";
 import {AcceptTrade, FetchTrades} from "@/communication/TradeComms";
 import {ShowNotification} from "@/components/NotificationService";
+import {useWallet} from "@aptos-labs/wallet-adapter-react";
 
-const TradeTicket = ({data}: { data: EventInterface }) => {
+const TradeTicket = ({data, account, signAndSubmitTransaction}: {
+    data: EventInterface;
+    account: any;
+    signAndSubmitTransaction: any;
+}) => {
     console.log(`Trading ticket with: ${data.tradeSeller} for ${data.tradePrice}`);
-    AcceptTrade(data).then(() => {
+    AcceptTrade(data, account, signAndSubmitTransaction).then(() => {
         console.log(`Trade with ${data.tradeSeller} for ${data.tradePrice} was successful`);
         ShowNotification('success', "Trade was successful");
     }).catch((error) => {
@@ -21,8 +26,10 @@ const TradeTicket = ({data}: { data: EventInterface }) => {
 };
 
 const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventInterface | null }) => {
+    const {account, signAndSubmitTransaction} = useWallet();
+
     return (
-        <div className={"w-[25rem] h-[12rem] flex flex-col items-center"}>
+        <div className={"w-[25rem] h-[14rem] flex flex-col items-center"}>
             <h1 className={"text-5xl font-bold my-3"}>Confirmation</h1>
             <p className={"text-xl text-center mb-3"}>Are you sure you want buy ticket
                 from {data?.tradeSeller} for {data?.tradePrice}, where initial price was: {data?.price}?</p>
@@ -31,7 +38,7 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
                     " font-bold py-2 px-4 rounded text-2xl relative isolate overflow-hidden"}
                 onClick={() => {
                     if (data !== null) {
-                        TradeTicket({data});
+                        TradeTicket({data, account, signAndSubmitTransaction});
                     }
 
                     closeModal();

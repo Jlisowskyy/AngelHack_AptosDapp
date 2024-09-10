@@ -11,12 +11,18 @@ import {SubmitTrade} from "@/communication/TradeComms";
 import {ShowNotification} from "@/components/NotificationService";
 import {useWallet} from "@aptos-labs/wallet-adapter-react";
 
-const SellTicket = ({data, price, name}: { data: EventInterface; price: number; name: string }) => {
+const SellTicket = ({data, price, name, account, signAndSubmitTransaction}: {
+    data: EventInterface;
+    price: number;
+    name: string;
+    account: any;
+    signAndSubmitTransaction: any;
+}) => {
     data.tradeSeller = name;
     data.tradePrice = price;
 
     console.log(`Selling ticket for ${data.title} at price ${price} with name ${name}`);
-    SubmitTrade(data).then(() => {
+    SubmitTrade(data, account, signAndSubmitTransaction).then(() => {
         ShowNotification("success", "Trade submitted successfully");
         console.log("Trade submitted successfully");
     }).catch((error) => {
@@ -45,6 +51,8 @@ const ConvertDate = (date: string | undefined) => {
 };
 
 const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventInterface }) => {
+    const {account, signAndSubmitTransaction} = useWallet();
+
     const [tradePrice, setTradePrice] = useState<number>(data.price);
     const [traderName, setTraderName] = useState<string>('Default name');
     const [error, setError] = useState<string>('');
@@ -136,7 +144,7 @@ const ModalWindow = ({closeModal, data}: { closeModal: () => void; data: EventIn
                         (error ? " opacity-50 cursor-not-allowed" : "")}
                     onClick={() => {
                         if (data !== null && !error) {
-                            SellTicket({data: data, price: tradePrice, name: traderName});
+                            SellTicket({data: data, price: tradePrice, name: traderName, account, signAndSubmitTransaction});
                             closeModal();
                         }
                     }}
