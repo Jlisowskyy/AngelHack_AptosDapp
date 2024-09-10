@@ -9,15 +9,40 @@ import {convertAmountFromHumanReadableToOnChain, APT_DECIMALS} from "@/utils/hel
 import { TradeApolloInterface } from "@/interface/TradeApolloInterface";
 import {MODULE_ADDRESS} from "@/config";
 
+export type SubmitTradeArgs = {
+    collection_address: string;
+    price: number;
+};
 
-export async function SubmitTrade(event: EventInterface): Promise<void> {
+export const SubmitTradeRequest = (args: SubmitTradeArgs): InputTransactionData => {
+    const {collection_address, price} = args;
+
+    console.log({
+        function: `${MODULE_ADDRESS}::launchpad::submit_trade`,
+        typeArguments: [],
+        functionArguments: [collection_address, price],
+    })
+
+    return {
+        data: {
+            function: `${MODULE_ADDRESS}::launchpad::submit_trade`,
+            typeArguments: [],
+            functionArguments: [collection_address, price],
+        },
+    };
+};
+export async function SubmitTrade(event: EventInterface, account: any, signAndSubmitTransaction: any): Promise<void> {
+    if (!account) 
+        throw new Error('Account is required');
     if (!event.tradePrice) {
         throw new Error('Trade price is required');
     }
 
     const onChainPrice = convertAmountFromHumanReadableToOnChain(event.tradePrice, APT_DECIMALS);
-
-    throw new Error('Not implemented');
+    const response = await signAndSubmitTransaction(
+        SubmitTradeRequest({collection_address: event.collectionID, price: onChainPrice}),
+    );
+    await GetAptosClient().waitForTransaction({transactionHash: response.hash});
 }
 
 async function FetchTrade(collectionId: string): Promise<TradeInterface[]> {
