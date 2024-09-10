@@ -68,14 +68,14 @@ export const AcceptTradeRequest = (args: AcceptTradeArgs): InputTransactionData 
     const {collectionId1, collectionId2} = args;
 
     console.log({
-        function: `${MODULE_ADDRESS}::launchpad::mint_nft`,
+        function: `${MODULE_ADDRESS}::launchpad::accept_trade`,
         typeArguments: [],
         functionArguments: [collectionId1, collectionId2],
     })
 
     return {
         data: {
-            function: `${MODULE_ADDRESS}::launchpad::mint_nft`,
+            function: `${MODULE_ADDRESS}::launchpad::accept_trade`,
             typeArguments: [],
             functionArguments: [collectionId1, collectionId2],
         },
