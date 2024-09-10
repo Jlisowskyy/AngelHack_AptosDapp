@@ -64,9 +64,9 @@ const EventPreviewComponent: React.FC<EventPreviewComponentProps> = ({
 
     const Description = () => {
         return (
-            <div className={"my-4 overflow-auto"}>
+            <div className={"my-4 h-full"}>
                 <p className={"py-1 text-5xl font-semibold mb-3"}>Description:</p>
-                <p className={"py-1 text-2xl font-normal"}>{data.description}</p>
+                <textarea readOnly className={"py-1 text-2xl font-normal w-full h-full bg-transparent"}>{data.description}</textarea>
             </div>
         );
     }
@@ -88,7 +88,7 @@ const EventPreviewComponent: React.FC<EventPreviewComponentProps> = ({
     return (
         <div className={"w-[100%] h-[100%] px-8 pb-8 pt-2"}>
             <div className="w-[100%] h-[100%] bg-amber-50 shadow-2xl rounded-2xl p-6 flex flex-col justify-between">
-                <div className={"flex flex-col"}>
+                <div className={"flex flex-col h-[85%]"}>
                     <Header/>
                     <Description/>
                 </div>

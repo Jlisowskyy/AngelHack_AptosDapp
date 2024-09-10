@@ -83,7 +83,7 @@ export async function SubmitEvent(event: EventInterface, signAndSubmitTransactio
 
     const response = await signAndSubmitTransaction(
         GetCreateCollectionRequest({
-            collectionDescription: event.description,
+            collectionDescription: event.title,
             collectionName: event.title,
             projectUri: event.link,
             maxSupply: event.initialTicketPool || 1,
