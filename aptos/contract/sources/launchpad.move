@@ -63,13 +63,6 @@ module launchpad_addr::launchpad {
     const TRADE_STATUS_OPEN: u64 = 0;
     const TRADE_STATUS_CLOSED: u64 = 1;
 
-
-    struct TradeOffer has store, drop {
-        price: u64,
-        seller: address,
-        status: u64,
-    }
-
     #[event]
     struct CreateCollectionEvent has store, drop {
         creator_addr: address,

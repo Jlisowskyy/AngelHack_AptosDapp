@@ -1,5 +1,6 @@
 'use client';
 import {AccountAddress} from "@aptos-labs/ts-sdk";
+import {InputTransactionData} from "@aptos-labs/wallet-adapter-react";
 import {GetAptosClient} from "@/utils/GetAptosClient";
 import {EventInterface} from '@/interface/EventInterface';
 import {MODULE_ADDRESS} from "@/utils/GetAptosClient";
@@ -7,6 +8,7 @@ import {FetchEventsFromDB} from "@/communication/EventComms";
 import {TradeInterface} from "@/interface/TradeInterface";
 import {TradeMocks} from "@/mocks/EventMocks";
 import {convertAmountFromHumanReadableToOnChain, APT_DECIMALS} from "@/utils/helpers";
+import { TradeApolloInterface } from "@/interface/TradeApolloInterface";
 
 
 export async function SubmitTrade(event: EventInterface): Promise<void> {
@@ -20,7 +22,7 @@ export async function SubmitTrade(event: EventInterface): Promise<void> {
 }
 
 async function FetchTrade(collectionId: string): Promise<TradeInterface[]> {
-    const tradesRes = await GetAptosClient().view<[string]>({
+    const tradesRes = await GetAptosClient().view<[Array<TradeApolloInterface>]>({
         payload: {
             function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_trades`,
             functionArguments: [collectionId],
@@ -35,8 +37,6 @@ async function FetchTrade(collectionId: string): Promise<TradeInterface[]> {
 }
 
 export async function FetchTrades(): Promise<EventInterface[]> {
-    return TradeMocks;
-
     const allTrades: EventInterface[] = [];
 
     try {
@@ -61,7 +61,33 @@ export async function FetchTrades(): Promise<EventInterface[]> {
         throw e;
     }
 }
+export type AcceptTradeArgs = {
+    collectionId1: string;
+    collectionId2: string;
+};
+export const AcceptTradeRequest = (args: AcceptTradeArgs): InputTransactionData => {
+    const {collectionId1, collectionId2} = args;
 
-export async function AcceptTrade(event: EventInterface): Promise<void> {
-    throw new Error('Not implemented');
+    console.log({
+        function: `${MODULE_ADDRESS}::launchpad::mint_nft`,
+        typeArguments: [],
+        functionArguments: [collectionId1, collectionId2],
+    })
+
+    return {
+        data: {
+            function: `${MODULE_ADDRESS}::launchpad::mint_nft`,
+            typeArguments: [],
+            functionArguments: [collectionId1, collectionId2],
+        },
+    };
+};
+export async function AcceptTrade(event: EventInterface, account: any, signAndSubmitTransaction: any): Promise<void> {
+    if (!account) 
+        throw new Error('Account is required');
+
+    const response = await signAndSubmitTransaction(
+        AcceptTradeRequest({collectionId1: event.collectionID, collectionId2: event.collectionID}),
+    );
+    await GetAptosClient().waitForTransaction({transactionHash: response.hash});
 }
