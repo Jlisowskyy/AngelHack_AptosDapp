@@ -27,12 +27,9 @@ async function FetchTrade(collectionId: string): Promise<TradeInterface[]> {
             functionArguments: [collectionId],
         },
     });
+    console.log("Received trades: ", tradesRes);
 
-    const [tradesStr] = tradesRes;
-    const trades: TradeInterface[] = JSON.parse(tradesStr);
-    console.log("Received trades: ", trades);
-
-    return trades;
+    return tradesRes;
 }
 
 export async function FetchTrades(): Promise<EventInterface[]> {
