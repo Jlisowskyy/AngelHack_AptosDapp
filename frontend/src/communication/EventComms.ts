@@ -123,7 +123,7 @@ export async function SubmitEvent(event: EventInterface, signAndSubmitTransactio
     console.log("Event: ", objEvent)
 
     console.log("Transaction confirmed")
-    event.collectionID = objEvent.collection_obj;
+    event.collectionID = objEvent.collection_obj.inner;
 
     console.log("Collection ID: ", event.collectionID);
 
