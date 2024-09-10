@@ -45,16 +45,19 @@ export async function SubmitTrade(event: EventInterface, account: any, signAndSu
     await GetAptosClient().waitForTransaction({transactionHash: response.hash});
 }
 
-async function FetchTrade(collectionId: string): Promise<TradeInterface[]> {
+async function FetchTrade(collectionId: string): Promise<TradeApolloInterface[]> {
     const tradesRes = await GetAptosClient().view<[Array<TradeApolloInterface>]>({
         payload: {
             function: `${AccountAddress.from(MODULE_ADDRESS)}::launchpad::get_trades`,
             functionArguments: [collectionId],
         },
     });
-    console.log("Received trades: ", tradesRes);
 
-    return tradesRes;
+    const [trades] = tradesRes;
+
+    console.log("Received trades: ", trades);
+
+    return trades;
 }
 
 export async function FetchTrades(): Promise<EventInterface[]> {
@@ -67,10 +70,14 @@ export async function FetchTrades(): Promise<EventInterface[]> {
             const trades = await FetchTrade(event.collectionID);
 
             for (const trade of trades) {
+                if (trade.collection_address !== event.collectionID) {
+                    continue;
+                }
+
                 const tradeEvent: EventInterface = { ...event };
-                tradeEvent.tradeSeller = trade.tradeSeller;
-                tradeEvent.tradePrice = trade.tradePrice;
-                tradeEvent.tradeSellerId = trade.tradeSellerId;
+                tradeEvent.tradeSeller = "UNKNOWN";
+                tradeEvent.tradePrice = trade.price / (10 ** APT_DECIMALS);
+                tradeEvent.tradeSellerId = trade.seller;
 
                 allTrades.push(tradeEvent);
             }
