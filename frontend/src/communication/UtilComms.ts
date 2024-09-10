@@ -1,6 +1,7 @@
 'use client';
-import {GetAptosClient, MODULE_ADDRESS} from "@/utils/GetAptosClient";
+import {GetAptosClient} from "@/utils/GetAptosClient";
 import {AccountAddress} from "@aptos-labs/ts-sdk";
+import {MODULE_ADDRESS} from "@/config";
 
 export async function GetTicketsLeft(collectionId: string): Promise<number | null> {
     return 0;
