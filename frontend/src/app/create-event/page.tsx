@@ -64,7 +64,7 @@ export default function CreateCollection() {
                 location: eventLocation,
                 image: eventImage,
                 link: eventLink,
-                date: publicMintStartDate?.toString() || "",
+                date: publicMintEndDate?.toString() || "",
                 description: eventDescription,
                 publicMintEndDate: publicMintEndDate,
                 publicMintStartDate: publicMintStartDate,
@@ -73,6 +73,7 @@ export default function CreateCollection() {
             };
 
             await SubmitEvent(event, signAndSubmitTransaction);
+            ShowNotification("success", "Collection created successfully!");
         } catch (error) {
             console.error("Error creating collection: ", error);
             ShowNotification("error", "Collection creation failed!");

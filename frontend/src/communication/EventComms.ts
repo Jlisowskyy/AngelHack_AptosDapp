@@ -104,11 +104,28 @@ export async function SubmitEvent(event: EventInterface, signAndSubmitTransactio
     console.log("Transaction sent")
     console.log(response)
 
-    await GetAptosClient().waitForTransaction({
+    const committedTransactionResponse = await GetAptosClient().waitForTransaction({
         transactionHash: response.hash,
     });
 
+    console.log("Transaction hash: ", response.hash)
+    console.log("Transaction response: ", committedTransactionResponse)
+
+    if (!committedTransactionResponse.success) {
+        throw new Error('Transaction failed');
+    }
+
+    if (committedTransactionResponse.events === undefined) {
+        throw new Error('No events in transaction');
+    }
+
+    const objEvent = committedTransactionResponse.events[2].data;
+    console.log("Event: ", objEvent)
+
     console.log("Transaction confirmed")
+    event.collectionID = objEvent.collection_obj;
+
+    console.log("Collection ID: ", event.collectionID);
 
     console.log("Event submitted")
     await SubmitEventToDB(event);
