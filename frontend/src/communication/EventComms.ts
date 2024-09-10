@@ -289,6 +289,14 @@ export type MintNftArguments = {
 
 export const MintNFTRequest = (args: MintNftArguments): InputTransactionData => {
     const {collectionId, amount} = args;
+    console.log("Minting NFT: ", collectionId, amount);
+
+    console.log({
+        function: `${MODULE_ADDRESS}::launchpad::mint_nft`,
+        typeArguments: [],
+        functionArguments: [collectionId, amount],
+    })
+
     return {
         data: {
             function: `${MODULE_ADDRESS}::launchpad::mint_nft`,

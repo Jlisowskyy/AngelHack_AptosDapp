@@ -66,7 +66,7 @@ const EventPreviewComponent: React.FC<EventPreviewComponentProps> = ({
         return (
             <div className={"my-4 h-full"}>
                 <p className={"py-1 text-5xl font-semibold mb-3"}>Description:</p>
-                <textarea readOnly className={"py-1 text-2xl font-normal w-full h-full bg-transparent"}>{data.description}</textarea>
+                <textarea readOnly className={"py-1 text-2xl font-normal w-full h-full bg-transparent"} defaultValue={data.description}/>
             </div>
         );
     }
