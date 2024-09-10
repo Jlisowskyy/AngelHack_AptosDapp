@@ -184,7 +184,6 @@ export async function FetchEventsFromDB(): Promise<EventInterface[]> {
 }
 
 
-
 interface NFT {
     collectionId: string;
     tokenId: string;
@@ -192,66 +191,27 @@ interface NFT {
 
 export async function FetchTickets(account: AccountInfo | null): Promise<EventInterface[]> {
     // should return list of collection IDs
-    async function fetchNfts() {
-        const tokens: NFT[] = [];
+    async function fetchNfts() : Promise<NFT[]>{
+        const tokenData: NFT[] = [];
 
         if (!account) {
             throw new Error('Wallet not connected');
         }
 
-        const addr = account.address.slice(8);
+        const addr = account.address;
         console.log(addr);
 
-        const GET_ACCOUNT_NFTS = `
-          query GetAccountNfts {
-            current_token_ownerships_v2(
-              where: {owner_address: {_eq: ${addr}, amount: {_gt: "0"}}
-            ) {
-              current_token_data {
-                collection_id
-                largest_property_version_v1
-                current_collection {
-                  collection_id
-                  collection_name
-                  description
-                  creator_address
-                  uri
-                  __typename
-                }
-                description
-                token_name
-                token_data_id
-                token_standard
-                token_uri
-                __typename
-              }
-              owner_address
-              amount
-              __typename
-            }
-          }
-        `;
+        const tokens = await GetAptosClient().getAccountOwnedTokens({accountAddress: addr});
+        console.log(tokens);
 
-        try {
-            const aptosClient = GetAptosClient();
-            const {data} = await aptosClient.queryIndexer(
-                {
-                    query: {
-                        query: GET_ACCOUNT_NFTS,
-                    }
-                }
-            )
-
-            console.log(data);
-            // TODO: PARSE TOKENS
-
-            return tokens;
-        } catch (err) {
-            console.error('Error fetching NFTs. Please try again.');
-            console.error(err);
-
-            throw err;
+        for (const token of tokens) {
+            tokenData.push({
+                collectionId: token.current_token_data.collection_id,
+                tokenId: "XD", // TODO
+            });
         }
+
+        return tokenData;
     }
 
     async function FilterNfts() {
@@ -274,10 +234,7 @@ export async function FetchTickets(account: AccountInfo | null): Promise<EventIn
         return returnEvents;
     }
 
-    // TODO:
-    // return await FilterNfts();
-
-    return TicketMocks;
+    return await FilterNfts();
 }
 
 export type MintNftArguments = {
