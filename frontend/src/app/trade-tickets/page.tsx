@@ -58,17 +58,11 @@ const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({on
     useEffect(() => {
         FetchTrades().then((trades) => {
             setTrades(trades);
-            // onLoad();
+            onLoad();
         }).catch((error) => {
             console.error(error);
             onError();
         });
-
-        const timer = setTimeout(() => {
-            onLoad();
-        }, 1000);
-
-        return () => clearTimeout(timer);
     }, [onLoad, onError]);
 
     return (

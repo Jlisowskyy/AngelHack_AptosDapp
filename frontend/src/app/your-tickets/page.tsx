@@ -170,18 +170,13 @@ const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({on
 
         FetchTickets(account).then((events) => {
             setTickets(events);
-            // onLoad();
+            onLoad();
         }).catch((error) => {
             console.error(error);
             onError();
         });
 
-        const timer = setTimeout(() => {
-            onLoad();
-        }, 1000);
-
         console.log("Tickets fetched");
-        return () => clearTimeout(timer);
     }, [onLoad, onError]);
     ``
 
@@ -211,7 +206,7 @@ const AsyncContent: React.FC<{ onLoad: () => void; onError: () => void }> = ({on
 
 export default function Page() {
     return (
-        <LoadingComponent text={"Loading trades..."} errorText={"Failed to fetch your tickets..."}>
+        <LoadingComponent text={"Loading your tickets..."} errorText={"Failed to fetch your tickets..."}>
             {(stopLoading, onError) => (
                 <AsyncContent onLoad={stopLoading} onError={onError}/>
             )}
