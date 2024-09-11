@@ -4,6 +4,8 @@ module launchpad_addr::test_end_to_end {
     use std::signer;
     use std::string;
     use std::vector;
+    use aptos_framework::object::{Self};
+
 
     use aptos_framework::aptos_coin::{Self, AptosCoin};
     use aptos_framework::coin;
@@ -51,11 +53,11 @@ module launchpad_addr::test_end_to_end {
             option::some(timestamp::now_seconds()),
             option::some(timestamp::now_seconds() + 100),
             option::some(3),
-            option::some(5),
+            option::some(0),
             option::some(timestamp::now_seconds() + 200),
             option::some(timestamp::now_seconds() + 300),
             option::some(2),
-            option::some(10),
+            option::some(0),
         );
         let registry = launchpad::get_registry();
         let collection_1 = *vector::borrow(&registry, vector::length(&registry) - 1);
@@ -96,6 +98,11 @@ module launchpad_addr::test_end_to_end {
         );
         assert!(start_time == 200, 10);
         assert!(end_time == 300, 11);
+
+        let collection_addr = object::object_address(&collection_1);
+        launchpad::submit_trade(user1, collection_addr, 1);
+
+        launchpad::accept_trade(user2, collection_1, collection_addr);
 
         // bump global timestamp to 350 so public mint stage is over
         timestamp::update_global_time_for_test_secs(350);
