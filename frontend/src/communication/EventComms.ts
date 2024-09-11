@@ -171,10 +171,10 @@ export async function FetchEventsFromDB(): Promise<EventInterface[]> {
 
         const events: EventInterface[] = await response.json();
 
-        for (const event of events) {
-            event.ticketsLeft = await GetTicketsLeft(event.collectionID) || 0;
-            event.ticketsTrades = await GetTicketsTrades(event.collectionID) || 0;
-        }
+        // for (const event of events) {
+        //     event.ticketsLeft = await GetTicketsLeft(event.collectionID) || 0;
+        //     event.ticketsTrades = await GetTicketsTrades(event.collectionID) || 0;
+        // }
 
         return events;
     } catch (error) {

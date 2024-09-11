@@ -55,7 +55,7 @@ export const DateTimeInput: FC<{
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto">
+        <PopoverContent className="w-auto bg-white">
           <Calendar
             mode="single"
             selected={date}
