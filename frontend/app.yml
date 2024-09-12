@@ -1,0 +1,17 @@
+runtime: nodejs
+env: flex
+
+env_variables:
+  NODE_ENV: 'production'
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
+
+runtime_config:
+  operating_system: "ubuntu22"
+  runtime_version: "22"
+
+entrypoint: npm run build | npm run start
+
